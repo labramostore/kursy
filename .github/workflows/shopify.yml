@@ -1,0 +1,281 @@
+# Весь Sale магазинов на Shopify (WSS, Asphaltgold) раз в день. Облако GitHub, Mac включать не нужно.
+# Собрано файлом собрать_github_shopify.py: внутри слово в слово универсальный.py и общие правила.
+# Результат: sale_<сайт>.json (весь Sale) и top_<сайт>.csv (топ-50, его читает таблица Google).
+name: Sale Shopify
+on:
+  schedule:
+    - cron: '45 7 * * *'   # 07:45 UTC = 12:45 по Астане
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install playwright
+      - name: Собрать Sale
+        run: |
+          mkdir -p "$RUNNER_TEMP/w" && cd "$RUNNER_TEMP/w"
+          cat > правила_отбора.py <<'PYEOF_1'
+          """Правила отбора: что НЕ берём в витрину. Общие для всех сайтов, правятся руками (или голосом через Claude).
+
+          Ищем слова в названии и типе товара (по-английски, как на сайтах), без учёта регистра.
+          """
+          from datetime import date
+
+          # Никогда не берём, в любой сезон
+          НИКОГДА = ["kids", "kid's", "baby", "toddler", "infant", "boys", "girls", "junior", "(gs)", "(ps)", "(td)",  # детское и подростковое
+                     "slide", "sandal", "flip flop", "flip-flop", "sock", "underwear", "brief", "boxer",
+                     "swim", "bikini", "bra ", "sports bra", "trunks"]
+
+          # Не берём зимой (ноябрь–март) — летняя одежда
+          НЕ_ЗИМОЙ = []  # выключено 08.11: зимой и поло, и футболки покупают; ждём решения по сезонности
+
+          # Не берём летом (май–сентябрь) — тёплая одежда
+          НЕ_ЛЕТОМ = []  # выключено 08.11: ждём решения по сезонности
+
+          # Спорт для зала, кроссовки и обувь — круглый год, их не фильтруем (отдельного списка нет)
+
+
+          def сезон(d=None):
+              m = (d or date.today()).month
+              return "зима" if m in (11, 12, 1, 2, 3) else "лето" if m in (5, 6, 7, 8, 9) else "межсезонье"
+
+
+          def причина_отказа(название, тип, d=None):
+              """Возвращает причину, почему товар не берём, или '' если берём."""
+              text = f" {название} {тип} ".lower()
+              s = сезон(d)
+              for w in НИКОГДА:
+                  if w in text:
+                      return f"никогда ({w.strip()})"
+              if s == "зима":
+                  for w in НЕ_ЗИМОЙ:
+                      if w in text:
+                          return f"не зимой ({w.strip()})"
+              if s == "лето":
+                  for w in НЕ_ЛЕТОМ:
+                      if w in text:
+                          return f"не летом ({w.strip()})"
+              return ""
+          PYEOF_1
+          cat > размеры_фильтр.py <<'PYEOF_2'
+          """Правила размеров для таблицы и витрины (правятся руками или голосом через Claude).
+
+          Показываем только обычные размеры. Tall и Short (одежда для высоких и низких) не берём,
+          широкую обувь (Wide) не берём. Всё это Илья смотрит отдельно, по запросу.
+          Размеры вообще собираем по запросу, для топ-20…30 одного сайта (не для всего каталога).
+          """
+          import re
+
+          ТОП_РАЗМЕРЫ = 30  # для скольких первых товаров с сайта показывать размеры
+
+          _ЛИШНИЕ_РАЗМЕРЫ = re.compile(r"\b(tall|short)\b", re.I)
+          _ШИРОКАЯ_ОБУВЬ = re.compile(r"\bwide\b|extra[- ]wide", re.I)
+
+
+          def широкая(название, тип=""):
+              """True, если модель — широкая обувь (её в витрину не берём)."""
+              return bool(_ШИРОКАЯ_ОБУВЬ.search(f"{название} {тип}"))
+
+
+          def обычные(размеры):
+              """Из списка меток размеров ('M', 'XL Tall', '10.5') оставляет только обычные."""
+              return [s for s in размеры if not _ЛИШНИЕ_РАЗМЕРЫ.search(s) and not _ШИРОКАЯ_ОБУВЬ.search(s)]
+          PYEOF_2
+          cat > универсальный.py <<'PYEOF_3'
+          """Универсальный сборщик скидок для магазинов на Shopify (WSS, Asphaltgold и сотни других).
+
+          Без ИИ. Открывает страницу раздела Sale в настоящем Chrome и забирает список товаров, который
+          магазин сам отдаёт своей странице (products.json): цены, старая цена, размеры и их наличие.
+          Берём ТОЛЬКО товары, у которых цена сейчас ниже обычной (compare_at_price > price) и есть размер в наличии.
+          Защиту сайтов не обходим; если сайт не отдал данные, так и пишем. Ходим редко: порции по 50 и паузы.
+
+          Запуск:  venv/bin/python универсальный.py              (все сайты из списка)
+                   venv/bin/python универсальный.py asphaltgold  (один сайт, по ключу)
+          Результат: данные/sale_<ключ>.json  (и короткая сводка в консоли)
+          """
+          import csv
+          import json
+          import re
+          import sys
+          import time
+          from datetime import date, datetime, timedelta, timezone
+          from pathlib import Path
+
+          from playwright.sync_api import sync_playwright
+
+          import правила_отбора
+          import размеры_фильтр
+
+          DIR = Path(__file__).parent
+          OUT = DIR / "данные"
+
+          # ключ: (название, адрес сайта, путь раздела Sale)
+          SHOPIFY = {
+              "wss": ("WSS", "https://www.shopwss.com", "/collections/on-sale"),
+              "asphaltgold": ("Asphaltgold", "https://www.asphaltgold.com", "/collections/sale"),
+          }
+
+          ТОП_CSV = 50        # сколько лучших по скидке класть в маленький top_<ключ>.csv для таблицы
+          PORTION = 50
+          MAX_PAGES = 100     # потолок: 5000 товаров на сайт за прогон (если упрёмся, в сводке будет «потолок»)
+          PAUSE = 2.5         # секунд между запросами
+          SIZE_NAMES = ("size", "größe", "groesse", "taille", "talla", "taglia", "maat")
+          COLOR_NAMES = ("color", "colour", "farbe", "couleur")
+
+          FETCH = """async ([path, n, per]) => {
+            const x = await fetch(path + '/products.json?limit=' + per + '&page=' + n);
+            const t = await x.text();
+            return [x.status, (x.headers.get('content-type') || ''), t];
+          }"""
+
+
+          def opt_index(options, names):
+              for i, o in enumerate(options):
+                  if o["name"].strip().lower() in names:
+                      return i
+              return None
+
+
+          def to_row(key, shop, base, p, currency):
+              opts = p.get("options", [])
+              si, ci = opt_index(opts, SIZE_NAMES), opt_index(opts, COLOR_NAMES)
+              if si is None and len(opts) == 1 and opts[0]["name"].strip().lower() != "title":
+                  si = 0  # единственная опция чаще всего размер
+              sale_vars = []
+              for v in p["variants"]:
+                  try:
+                      now, was = float(v["price"]), float(v["compare_at_price"] or 0)
+                  except (TypeError, ValueError):
+                      continue
+                  if was > now > 0 and v.get("available"):
+                      sale_vars.append((now, was, v))
+              if not sale_vars:
+                  return None
+              now, was, v0 = min(sale_vars, key=lambda t: t[0])
+              label = lambda v, i: (v.get(f"option{i + 1}") or "").strip()
+              sizes = []
+              if si is not None:
+                  seen = set()
+                  for v in p["variants"]:
+                      s = label(v, si)
+                      if s and s not in seen:
+                          seen.add(s)
+                          sizes.append([s, s, bool(v.get("available"))])
+                  sizes = [s for s in sizes if размеры_фильтр.обычные([s[0]]) == [s[0]]]
+              title = p["title"]
+              return {
+                  "артикул": f"{key}-{p['id']}",
+                  "название": title,
+                  "тип": p.get("product_type", "") or "",
+                  "бренд": p.get("vendor", ""),
+                  "цвет": label(v0, ci) if ci is not None else "",
+                  "цена_сейчас": now,
+                  "цена_была": was,
+                  "скидка_%": round((was - now) / was * 100),
+                  "валюта": currency,
+                  "картинка": (p.get("images") or [{}])[0].get("src", ""),
+                  "ссылка": f"{base}/products/{p['handle']}",
+                  "размеры": sizes,
+                  "теги": ", ".join(p.get("tags", [])[:8]) if isinstance(p.get("tags"), list) else str(p.get("tags", ""))[:80],
+                  "магазин": shop,
+                  "дата_сбора": date.today().isoformat(),
+              }
+
+
+          def write_top_csv(key, rows):
+              """top_<ключ>.csv: лучшие по скидке; таблица Google подтягивает его формулой IMPORTDATA.
+              Размеры уже в наличии на момент сбора (Shopify отдаёт их вместе с товаром), время сбора пишем рядом."""
+              now = (datetime.now(timezone.utc) + timedelta(hours=5)).strftime("%d.%m.%Y %H:%M") + " (Астана)"
+              cols = ["дата_сбора", "магазин", "артикул", "название", "тип", "цвет", "цена_сейчас", "цена_была",
+                      "валюта", "ссылка", "картинка", "размеры_в_наличии", "размеры_собраны"]
+              with (OUT / f"top_{key}.csv").open("w", newline="", encoding="utf-8") as f:
+                  w = csv.writer(f)
+                  w.writerow(cols)
+                  for r in rows[:ТОП_CSV]:
+                      sizes = ", ".join(s[0] for s in r["размеры"] if s[2])
+                      w.writerow([r["дата_сбора"], r["магазин"], r["артикул"], r["название"], r["тип"], r["цвет"],
+                                  r["цена_сейчас"], r["цена_была"], r["валюта"], r["ссылка"], r["картинка"], sizes, now])
+
+
+          def collect(browser, key):
+              shop, base, path = SHOPIFY[key]
+              pg = browser.new_context(locale="en-US", viewport={"width": 1366, "height": 900}).new_page()
+              stat = {"сайт": shop, "ключ": key, "страниц": 0, "товаров_всего": 0, "со_скидкой": 0, "отсеяно_правилами": 0}
+              try:
+                  resp = pg.goto(base + path, wait_until="domcontentloaded", timeout=45000)
+                  pg.wait_for_timeout(3000)
+                  stat["ответ_страницы"] = resp.status if resp else None
+                  currency = pg.evaluate("window.Shopify && window.Shopify.currency ? window.Shopify.currency.active : null")
+                  stat["валюта"] = currency
+                  rows = []
+                  for n in range(1, MAX_PAGES + 1):
+                      status, ctype, text = pg.evaluate(FETCH, [path, n, PORTION])
+                      if status != 200 or "json" not in ctype:
+                          stat["ошибка"] = f"products.json вернул {status} ({ctype[:30]}) на странице {n}"
+                          break
+                      products = json.loads(text).get("products", [])
+                      if not products:
+                          break
+                      stat["страниц"] = n
+                      stat["товаров_всего"] += len(products)
+                      for p in products:
+                          row = to_row(key, shop, base, p, currency)
+                          if not row:
+                              continue
+                          stat["со_скидкой"] += 1
+                          why = правила_отбора.причина_отказа(row["название"], f"{row['тип']} {row['теги']}")
+                          if why or размеры_фильтр.широкая(row["название"], row["тип"]):
+                              stat["отсеяно_правилами"] += 1
+                              continue
+                          rows.append(row)
+                      if len(products) < PORTION:
+                          break
+                      if n == MAX_PAGES:
+                          stat["потолок"] = f"достигнут предел {MAX_PAGES * PORTION} товаров, возможно, это не весь Sale"
+                      time.sleep(PAUSE)
+                  rows.sort(key=lambda r: (-r["скидка_%"], r["цена_сейчас"]))
+                  OUT.mkdir(exist_ok=True)
+                  (OUT / f"sale_{key}.json").write_text(
+                      json.dumps({"сайт": shop, "дата": date.today().isoformat(), "валюта": currency, "товаров": len(rows), "rows": rows},
+                                 ensure_ascii=False), encoding="utf-8")
+                  stat["итого_в_файле"] = len(rows)
+                  write_top_csv(key, rows)
+              except Exception as e:
+                  stat["ошибка"] = f"{type(e).__name__}: {str(e)[:150]}"
+              finally:
+                  pg.context.close()
+              return stat
+
+
+          def main():
+              keys = sys.argv[1:] or list(SHOPIFY)
+              with sync_playwright() as p:
+                  b = p.chromium.launch(channel="chrome", headless=True)
+                  for i, k in enumerate(keys):
+                      if k not in SHOPIFY:
+                          print("нет такого сайта в списке:", k)
+                          continue
+                      if i:
+                          time.sleep(PAUSE * 2)
+                      print(json.dumps(collect(b, k), ensure_ascii=False), flush=True)
+                  b.close()
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF_3
+          python универсальный.py
+          cp данные/sale_*.json данные/top_*.csv "$GITHUB_WORKSPACE/"
+      - name: Положить в репозиторий
+        run: |
+          git config user.name "kurs-bot"
+          git config user.email "kurs-bot@users.noreply.github.com"
+          git add sale_*.json top_*.csv
+          git commit -m "shopify $(date -u +%F)" || exit 0
+          git push
