@@ -1,0 +1,46 @@
+# ТЕСТ: можно ли проверять размеры Nike с серверов GitHub (а значит, с обычного арендованного сервера).
+# Ничего не меняет в репозитории: открывает 3 страницы товаров в настоящем Chrome и печатает в журнал,
+# какие размеры в наличии. Запуск вручную: вкладка Actions -> «Тест проверки размера» -> Run workflow.
+name: Тест проверки размера
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Поставить playwright (Chrome на сервере уже есть)
+        run: pip install playwright
+      - name: Проверить 3 товара
+        run: |
+          cat > t.py <<'PYEOF'
+          import time
+          from playwright.sync_api import sync_playwright
+          JS = """els => els.map(e => [e.value, e.getAttribute('aria-disabled') !== 'true'])"""
+          URLS = [
+              "https://www.nike.com/t/precision-7-mens-basketball-shoes-IKdj8qoO/FN4322-001",
+              "https://www.nike.com/t/air-vapormax-plus-mens-shoe-nC0dzF/CW6973-600",
+              "https://www.nike.com/t/reactx-rejuven8-mens-shoes-d9QTC07e/HV5060-702",
+          ]
+          with sync_playwright() as p:
+              b = p.chromium.launch(channel="chrome", headless=True)
+              pg = b.new_context(locale="en-US", viewport={"width": 1280, "height": 900}).new_page()
+              for u in URLS:
+                  t0 = time.time()
+                  try:
+                      with pg.expect_response(lambda r: "available_gtins" in r.url, timeout=45000) as ri:
+                          pg.goto(u, wait_until="domcontentloaded", timeout=45000)
+                      st = ri.value.status
+                      pg.wait_for_timeout(1500)
+                      res = pg.eval_on_selector_all('input[name="grid-selector-input"]', JS)
+                      print("ОК", u.split("/")[-1], "ответ сайта", st, "за", round(time.time() - t0, 1), "с;",
+                            "в наличии:", [v for v, ok in res if ok], "из", len(res))
+                  except Exception as e:
+                      print("НЕ ВЫШЛО", u.split("/")[-1], type(e).__name__, str(e)[:200])
+              b.close()
+          PYEOF
+          python t.py
