@@ -143,6 +143,15 @@ jobs:
               return None
 
 
+          def norm_size(s):
+              """'07.0' -> '7', '08.5' -> '8.5' (магазины иногда дописывают ноль спереди и «.0»); остальное как есть."""
+              m = re.fullmatch(r"0*(\d+)(?:\.(\d+))?", s.strip())
+              if not m:
+                  return s.strip()
+              whole, frac = m.groups()
+              return whole if frac in (None, "", "0", "00") else f"{whole}.{frac}"
+
+
           def to_row(key, shop, base, p, currency):
               opts = p.get("options", [])
               si, ci = opt_index(opts, SIZE_NAMES), opt_index(opts, COLOR_NAMES)
@@ -164,7 +173,7 @@ jobs:
               if si is not None:
                   seen = set()
                   for v in p["variants"]:
-                      s = label(v, si)
+                      s = norm_size(label(v, si))
                       if s and s not in seen:
                           seen.add(s)
                           sizes.append([s, s, bool(v.get("available"))])
