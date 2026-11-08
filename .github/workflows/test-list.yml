@@ -1,0 +1,261 @@
+# ТЕСТ: какие сайты из списка (одежда, косметика, техника) открываются с серверов GitHub (США).
+# Результат кладёт в проверка_сайтов_облако.json.
+name: Проверка сайтов из облака
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install playwright
+      - name: Проверить сайты
+        run: |
+          mkdir -p "$RUNNER_TEMP/w" && cd "$RUNNER_TEMP/w"
+          cat > проверка_сайтов.py <<'PYEOF_1'
+          """Проверка: открываются ли сайты магазинов в настоящем Chrome и где у них раздел Sale.
+
+          Не собирает товары. Для каждого сайта печатает: ответ, итоговый адрес, заголовок, признаки защиты
+          (капча, «доступ запрещён», проверка браузера) и до 3 ссылок на Sale/Clearance/Outlet.
+          Капчи и защиту не обходит: если сайт не пустил, так и пишем.
+
+          Запуск:  venv/bin/python проверка_сайтов.py [файл_результата.json]
+          """
+          import json
+          import re
+          import sys
+          import time
+
+          from playwright.sync_api import sync_playwright
+
+          SITES = [
+              ("Foot Locker", "https://www.footlocker.com"),
+              ("Joe's New Balance Outlet", "https://www.joesnewbalanceoutlet.com"),
+              ("WSS", "https://www.shopwss.com"),
+              ("Asphaltgold", "https://www.asphaltgold.com"),
+              ("JD Sports", "https://www.jdsports.com"),
+              ("KICKS CREW", "https://www.kickscrew.com"),
+              ("Zappos", "https://www.zappos.com"),
+              ("Zalando Outlet", "https://www.zalando-lounge.com/selectcountry"),
+              ("Macy's", "https://www.macys.com"),
+              ("Nordstrom", "https://www.nordstrom.com"),
+              ("Nordstrom Rack", "https://www.nordstromrack.com"),
+              ("ASOS", "https://www.asos.com"),
+              ("Cettire", "https://www.cettire.com"),
+              ("SSENSE", "https://www.ssense.com"),
+              ("YOOX", "https://www.yoox.com"),
+              ("Finish Line", "https://www.finishline.com"),
+              ("Saks OFF 5TH", "https://www.saksoff5th.com"),
+          ]
+
+          BLOCK = re.compile(r"captcha|are you a robot|access denied|verify you are human|just a moment|px-captcha|"
+                             r"unusual traffic|pardon our interruption|request blocked|bot detection|"
+                             r"checking your browser|attention required", re.I)
+          SALE = re.compile(r"\b(sale|clearance|outlet|markdown|deals|last chance|распродаж)\b", re.I)
+
+          JS_LINKS = """() => [...document.querySelectorAll('a[href]')].map(a => [(a.innerText||'').trim().slice(0,40), a.href])
+              .filter(x => x[0] && x[0].length < 30)"""
+
+
+          def check(pg, name, url):
+              t0 = time.time()
+              r = {"сайт": name, "адрес": url}
+              try:
+                  resp = pg.goto(url, wait_until="domcontentloaded", timeout=40000)
+                  pg.wait_for_timeout(4000)
+                  r["ответ"] = resp.status if resp else None
+                  r["итог_адрес"] = pg.url[:100]
+                  r["заголовок"] = (pg.title() or "")[:80]
+                  text = pg.evaluate("document.body ? document.body.innerText.slice(0, 3000) : ''")
+                  m = BLOCK.search(f"{r['заголовок']} {text}")
+                  r["защита"] = m.group(0) if m else ""
+                  host = re.sub(r"^https?://(www\.)?", "", url).split("/")[0].split(".")[-2]
+                  links = [x for x in pg.evaluate(JS_LINKS) if SALE.search(x[0]) and host in x[1]]
+                  seen, out = set(), []
+                  for t, h in links:
+                      if h not in seen:
+                          seen.add(h)
+                          out.append(f"{t} -> {h[:110]}")
+                  r["sale_ссылки"] = out[:3]
+                  r["текст_страницы"] = len(text)
+                  r["shopify"] = bool(pg.evaluate("!!(window.Shopify || document.querySelector('script[src*=\"cdn.shopify.com\"]'))"))
+              except Exception as e:
+                  r["ошибка"] = f"{type(e).__name__}: {str(e)[:120]}"
+              r["сек"] = round(time.time() - t0, 1)
+              return r
+
+
+          def load_list(groups=("одежда и обувь", "косметика", "техника")):
+              import csv
+              from pathlib import Path
+              rows = csv.DictReader((Path(__file__).parent / "сайты.csv").open(encoding="utf-8-sig"))
+              return [(r["название"], r["адрес"]) for r in rows if r["группа"] in groups]
+
+
+          def main():
+              global SITES
+              args = [a for a in sys.argv[1:] if not a.startswith("--")]
+              if "--список" in sys.argv:
+                  SITES = load_list()
+              elif "--новые" in sys.argv:
+                  SITES = load_list(("косметика", "техника"))  # только косметика и техника
+              out = args[0] if args else None
+              results = []
+              with sync_playwright() as p:
+                  b = p.chromium.launch(channel="chrome", headless=True)
+                  for name, url in SITES:
+                      ctx = b.new_context(locale="en-US", viewport={"width": 1366, "height": 900})
+                      pg = ctx.new_page()
+                      r = check(pg, name, url)
+                      ctx.close()
+                      results.append(r)
+                      flag = "ОШИБКА" if "ошибка" in r else ("ЗАЩИТА:" + r["защита"] if r.get("защита") else "ок")
+                      print(f"{name:26} {str(r.get('ответ')):>4} {flag:28} {r['сек']:>5}с  sale: {len(r.get('sale_ссылки', []))}{'  [Shopify]' if r.get('shopify') else ''}", flush=True)
+                  b.close()
+              if out:
+                  json.dump(results, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+                  print("сохранено:", out)
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF_1
+          cat > сайты.csv <<'CSVEOF_1'
+          домен,название,адрес,группа,источник,проверка_08.11_с_Mac,shopify,ссылка_sale_найдена
+          michaelkors.com,MICHAEL KORS,https://www.michaelkors.com,одежда и обувь,гайд,закрыт защитой,,
+          calvinklein.us,Calvin Klein,https://www.calvinklein.us/en,одежда и обувь,гайд,закрыт защитой,,
+          usa.tommy.com,Tommy Hilfiger,https://usa.tommy.com/en,одежда и обувь,гайд,не открылся,,
+          gap.com,GAP/Old Navy,https://www.gap.com,одежда и обувь,гайд,открыт,,да
+          ralphlauren.com,RALPH LAUREN,https://www.ralphlauren.com,одежда и обувь,гайд,пустая страница,,
+          timberland.com,Timberland,https://www.timberland.com/en-us,одежда и обувь,гайд,закрыт защитой,,
+          newbalance.com,New Balance,https://www.newbalance.com,одежда и обувь,гайд,закрыт защитой,,
+          aldoshoes.com,ALDO,https://www.aldoshoes.com/us/en_US,одежда и обувь,гайд,открыт,да,да
+          columbia.com,Columbia,https://www.columbia.com,одежда и обувь,гайд,закрыт защитой,,
+          ugg.com,UGG,https://www.ugg.com/eu,одежда и обувь,гайд,закрыт защитой,,
+          donnakaran.com,DKNY,https://www.donnakaran.com,одежда и обувь,гайд,закрыт защитой,да,да
+          levi.com,Levi’s,https://www.levi.com/US/en_US,одежда и обувь,гайд,закрыт защитой,,
+          tsubo.com,Tsubo,http://www.tsubo.com,одежда и обувь,гайд,закрыт защитой,,
+          guess.com,GUESS,https://www.guess.com/us/en/home,одежда и обувь,гайд,закрыт защитой,,
+          shop.diesel.com,Diesel,https://shop.diesel.com/en,одежда и обувь,гайд,открыт,,да
+          nike.com,Nike,https://www.nike.com,одежда и обувь,гайд,открыт,,да
+          adidas.com,Adidas,https://www.adidas.com/us,одежда и обувь,гайд,закрыт защитой,,
+          us.puma.com,PUMA,https://us.puma.com/us/en/home,одежда и обувь,гайд,открыт,,да
+          armaniexchange.com,Armani Exchange,https://www.armaniexchange.com/us,одежда и обувь,гайд,не открылся,,
+          jcrew.com,J.Crew,https://www.jcrew.com,одежда и обувь,гайд,открыт,,да
+          guessfactory.com,Guess Factory,https://www.guessfactory.com/us/en/home/,одежда и обувь,гайд,закрыт защитой,,
+          uniqlo.com,Uniqlo,https://www.uniqlo.com/us/en,одежда и обувь,гайд,закрыт защитой,,
+          wrangler.com,Wrangler,https://www.wrangler.com,одежда и обувь,гайд,закрыт защитой,,
+          armani.com,Armani,https://www.armani.com/en-us,одежда и обувь,гайд,открыт,,да
+          danskin.com,Danskin,https://www.danskin.com/,одежда и обувь,гайд,не открылся,,
+          forever21.com,Forever 21,https://www.forever21.com/,одежда и обувь,гайд,открыт,да,да
+          6pm.com,6pm,https://www.6pm.com/,одежда и обувь,гайд,открыт,,да
+          macys.com,Macy’s,https://www.macys.com/,одежда и обувь,гайд + список,закрыт защитой,,
+          joesnewbalanceoutlet.com,Joe’s New Balance Outlet,https://www.joesnewbalanceoutlet.com/,одежда и обувь,гайд + список,закрыт защитой,,
+          jomashop.com,JomaShop,https://www.jomashop.com/,одежда и обувь,гайд,закрыт защитой,,да
+          saksoff5th.com,Saks Fifth Avenue,https://www.saksoff5th.com/,одежда и обувь,гайд + список,пустая страница,,
+          nordstrom.com,Nordstrom,https://www.nordstrom.com/,одежда и обувь,гайд + список,пустая страница,,
+          nordstromrack.com,Nordstrom Rack,https://www.nordstromrack.com/,одежда и обувь,гайд + список,пустая страница,,
+          uspoloassn.com,U.S. Polo Assn,"https://uspoloassn.com/ Популярный бренд спортивной и классической одежды, обуви и",одежда и обувь,гайд,ответ 404,да,да
+          justfab.com,Just Fab,https://www.justfab.com/,одежда и обувь,гайд,открыт,да,
+          dsw.com,DSW.com,https://www.dsw.com/,одежда и обувь,гайд,пустая страница,,
+          karllagerfeldparis.com,Karl Lagerfeld,https://www.karllagerfeldparis.com/,одежда и обувь,гайд,закрыт защитой,да,да
+          ray-ban.com,Ray Ban,https://www.ray-ban.com/,одежда и обувь,гайд,закрыт защитой,,
+          asos.com,ASOS,https://www.asos.com/,одежда и обувь,гайд + список,закрыт защитой,,
+          marcjacobs.com,Marc Jacobs,https://www.marcjacobs.com/,одежда и обувь,гайд,закрыт защитой,,
+          coachoutlet.com,COACH Outlet,https://www.coachoutlet.com/,одежда и обувь,гайд,закрыт защитой,,
+          juicycouture.com,Juicy Couture,https://juicycouture.com/,одежда и обувь,гайд,открыт,да,да
+          thenorthface.com,The North Face,https://www.thenorthface.com/,одежда и обувь,гайд,закрыт защитой,,
+          overstock.com,Overstock,https://www.overstock.com/,одежда и обувь,гайд,пустая страница,,
+          amazon.com,Amazon,https://www.amazon.com/,одежда и обувь,гайд,открыт,,да
+          ebay.com,Ebay,https://www.ebay.com/,одежда и обувь,гайд,закрыт защитой,,
+          patagonia.com,Patagonia,https://www.patagonia.com,одежда и обувь,гайд,пустая страница,,
+          footlocker.com,Foot Locker,https://www.footlocker.com,одежда и обувь,список,ответ 404,,
+          shopwss.com,WSS,https://www.shopwss.com,одежда и обувь,список,открыт,да,да
+          asphaltgold.com,Asphaltgold,https://www.asphaltgold.com,одежда и обувь,список,открыт,да,да
+          jdsports.com,JD Sports,https://www.jdsports.com,одежда и обувь,список,закрыт защитой,,
+          kickscrew.com,KICKS CREW,https://www.kickscrew.com,одежда и обувь,список,закрыт защитой,,
+          zappos.com,Zappos,https://www.zappos.com,одежда и обувь,список,открыт,,да
+          zalando-lounge.com,Zalando Outlet,https://www.zalando-lounge.com/selectcountry,одежда и обувь,список,не открылся,,
+          cettire.com,Cettire,https://www.cettire.com,одежда и обувь,список,закрыт защитой,,
+          ssense.com,SSENSE,https://www.ssense.com,одежда и обувь,список,закрыт защитой,,
+          yoox.com,YOOX,https://www.yoox.com,одежда и обувь,список,закрыт защитой,,
+          finishline.com,Finish Line,https://www.finishline.com,одежда и обувь,список,закрыт защитой,,
+          carters.com,Carter’s,https://www.carters.com/,детские (не берём),гайд,,,
+          shopdisney.com,Disney,https://www.shopdisney.com/,детские (не берём),гайд,,,
+          gymboree.com,Gymboree,https://www.gymboree.com/us/home,детские (не берём),гайд,,,
+          childrensplace.com,The Children’s PLACE,https://www.childrensplace.com/,детские (не берём),гайд,,,
+          zulily.com,Zulily,https://www.zulily.com/,детские (не берём),гайд,,,
+          shop.mattel.com,Fisher Price,https://shop.mattel.com/pages/fisher-price,детские (не берём),гайд,,,
+          buildabear.com,Build a Bear,https://www.buildabear.com/,детские (не берём),гайд,,,
+          toysrus.com,ToysRus,https://www.toysrus.com/,детские (не берём),гайд,,,
+          toywiz.com,ToyWiz,https://toywiz.com/,детские (не берём),гайд,,,
+          booksamillion.com,BAM Books Million,https://booksamillion.com/,детские (не берём),гайд,,,
+          hottopic.com,Hot Topic,https://www.hottopic.com/,детские (не берём),гайд,,,
+          americangirl.com,American Girl,https://www.americangirl.com,детские (не берём),гайд,,,
+          burtsbeesbaby.com,Burt’s Bees Baby,https://www.burtsbeesbaby.com/,детские (не берём),гайд,,,
+          buycostumes.com,Buy Costumes,https://www.buycostumes.com/,детские (не берём),гайд,,,
+          boba.com,Boba,https://boba.com/,детские (не берём),гайд,,,
+          attitudeliving.com,Attitude,https://attitudeliving.com/,детские (не берём),гайд,,,
+          babyaspen.com,Baby Aspen,https://www.babyaspen.com/,детские (не берём),гайд,,,
+          kidssocks.com,Kidssocks,http://www.kidssocks.com/,детские (не берём),гайд,,,
+          brackitz.com,Brackitz,https://brackitz.com/,детские (не берём),гайд,,,
+          claires.com,Claire’s,https://www.claires.com/,детские (не берём),гайд,,,
+          hannaandersson.com,Hanna Andersson,https://www.hannaandersson.com/,детские (не берём),гайд,,,
+          seekairun.com,See Kai Run,https://seekairun.com/,детские (не берём),гайд,,,
+          binxybaby.com,Binxy Baby,https://binxybaby.com/,детские (не берём),гайд,,,
+          roommatesdecor.com,Room Mates Décor,https://roommatesdecor.com/,детские (не берём),гайд,,,
+          crocs.com,Crocs,https://www.crocs.com/,детские (не берём),гайд,,,
+          barnesandnoble.com,Barnes & Noble,https://www.barnesandnoble.com/,детские (не берём),гайд,,,
+          halloweenexpress.com,Halloween Express,https://www.halloweenexpress.com/,детские (не берём),гайд,,,
+          sephora.com,Sephora,https://www.sephora.com/,косметика,гайд,,,
+          yvesrocherusa.com,Yves Rocher,https://www.yvesrocherusa.com/,косметика,гайд,,,
+          iherb.com,iHerb,https://iherb.com/,косметика,гайд,,,
+          bathandbodyworks.com,Bath & Body Works,https://www.bathandbodyworks.com/,косметика,гайд,,,
+          anastasiabeverlyhills.com,Anastasia Beverly Hills,https://www.anastasiabeverlyhills.com/,косметика,гайд,,,
+          kiehls.com,Kiehl’s,https://www.kiehls.com/,косметика,гайд,,,
+          walgreens.com,Walgreens,https://www.walgreens.com/,косметика,гайд,,,
+          maccosmetics.com,MAC,https://www.maccosmetics.com/,косметика,гайд,,,
+          beautylish.com,Beautylish,https://www.beautylish.com/,косметика,гайд,,,
+          elfcosmetics.com,e.l.f.,https://www.elfcosmetics.com/,косметика,гайд,,,
+          toofaced.com,Too Faced,https://www.toofaced.com/,косметика,гайд,,,
+          tartecosmetics.com,Tarte,https://tartecosmetics.com/,косметика,гайд,,,
+          bobbibrowncosmetics.com,Bobbi Brown,https://www.bobbibrowncosmetics.com/,косметика,гайд,,,
+          sleekshop.com,Sleek Shop,https://sleekshop.com/,косметика,гайд,,,
+          besamecosmetics.com,Besame Cosmetics,https://besamecosmetics.com/,косметика,гайд,,,
+          sallybeauty.com,Sally Beauty,https://www.sallybeauty.com/,косметика,гайд,,,
+          benefitcosmetics.com,Benefit,https://www.benefitcosmetics.com/en-us,косметика,гайд,,,
+          brilliancenewyork.com,Brilliance New York,https://www.brilliancenewyork.com/,косметика,гайд,,,
+          dermstore.com,DermStore,https://www.dermstore.com/,косметика,гайд,,,
+          clinique.com,Clinique,https://www.clinique.com/,косметика,гайд,,,
+          evolutionofsmooth.com,EOS,https://evolutionofsmooth.com/,косметика,гайд,,,
+          blissworld.com,Bliss,https://www.blissworld.com/,косметика,гайд,,,
+          narscosmetics.com,Nars,https://www.narscosmetics.com/,косметика,гайд,,,
+          kikocosmetics.com,Kiko,https://www.kikocosmetics.com/,косметика,гайд,,,
+          feelunique.com,Feel Unique,https://www.feelunique.com/,косметика,гайд,,,
+          apple.com,Apple,https://www.apple.com/,техника,гайд,,,
+          walmart.com,Walmart,https://www.walmart.com/,техника,гайд,,,
+          bhphotovideo.com,B&H Photo Video,https://www.bhphotovideo.com/,техника,гайд,,,
+          samsung.com,Samsung,https://www.samsung.com/us/,техника,гайд,,,
+          lenovo.com,Lenovo,https://www.lenovo.com/,техника,гайд,,,
+          irobot.com,iRobot,https://www.irobot.com/,техника,гайд,,,
+          musiciansfriend.com,Musician’s Friend,https://www.musiciansfriend.com/,техника,гайд,,,
+          dell.com,Dell,https://www.dell.com/,техника,гайд,,,
+          digikey.com,Digi-Key,https://www.digikey.com/,техника,гайд,,,
+          newegg.com,NewEgg,https://www.newegg.com/,техника,гайд,,,
+          esteelauder.com,Estée Lauder,https://www.esteelauder.com,косметика,Илья (в чате),,,
+          charlottetilbury.com,Charlotte Tilbury,https://www.charlottetilbury.com,косметика,Илья (в чате),,,
+          rhodeskin.com,Rhode,https://www.rhodeskin.com,косметика,"Илья (в чате, подтверждено)",,,
+          CSVEOF_1
+          python проверка_сайтов.py --список "$GITHUB_WORKSPACE/проверка_сайтов_облако.json" || true
+      - name: Положить результат в репозиторий
+        run: |
+          git config user.name "kurs-bot"
+          git config user.email "kurs-bot@users.noreply.github.com"
+          git add проверка_сайтов_облако.json
+          git commit -m "проверка сайтов из облака $(date -u +%F)" || exit 0
+          git push
