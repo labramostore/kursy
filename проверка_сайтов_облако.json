@@ -1,0 +1,1230 @@
+[
+ {
+  "сайт": "MICHAEL KORS",
+  "адрес": "https://www.michaelkors.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.michaelkors.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 201,
+  "shopify": false,
+  "сек": 4.4
+ },
+ {
+  "сайт": "Calvin Klein",
+  "адрес": "https://www.calvinklein.us/en",
+  "ответ": 403,
+  "итог_адрес": "https://www.calvinklein.us/en",
+  "заголовок": "Calvin Klein® | Error",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 160,
+  "shopify": false,
+  "сек": 4.1
+ },
+ {
+  "сайт": "Tommy Hilfiger",
+  "адрес": "https://usa.tommy.com/en",
+  "ответ": 403,
+  "итог_адрес": "https://usa.tommy.com/en",
+  "заголовок": "Tommy Hilfiger | Error",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 160,
+  "shopify": false,
+  "сек": 4.1
+ },
+ {
+  "сайт": "GAP/Old Navy",
+  "адрес": "https://www.gap.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.gap.com/",
+  "заголовок": "Gap Individual style for Women's, Men's, Baby & Kids' Clothing",
+  "защита": "",
+  "sale_ссылки": [
+   "Sale -> https://www.gap.com/browse/category.do?cid=65179&nav=meganav%3AWomen%3ACategories%3ASale#pageId=0&department=1",
+   "Sale -> https://www.gap.com/browse/category.do?cid=65289&nav=meganav%3AMen%3ACategories%3ASale#pageId=0&department=75",
+   "Sale -> https://www.gap.com/browse/category.do?cid=65194&nav=meganav%3AGirls%3ACategories%3ASale#pageId=0&department=4"
+  ],
+  "текст_страницы": 1227,
+  "shopify": false,
+  "сек": 6.3
+ },
+ {
+  "сайт": "RALPH LAUREN",
+  "адрес": "https://www.ralphlauren.com",
+  "ответ": 307,
+  "итог_адрес": "https://www.ralphlauren.com/",
+  "заголовок": "Access to this page has been denied",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 128,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Timberland",
+  "адрес": "https://www.timberland.com/en-us",
+  "ответ": 403,
+  "итог_адрес": "https://www.timberland.com/en-us",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 205,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "New Balance",
+  "адрес": "https://www.newbalance.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.newbalance.com/",
+  "заголовок": "New Balance Shoes & Apparel | Official New BalanceÂ® Site",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 107,
+  "shopify": false,
+  "сек": 4.1
+ },
+ {
+  "сайт": "ALDO",
+  "адрес": "https://www.aldoshoes.com/us/en_US",
+  "ответ": 200,
+  "итог_адрес": "https://www.aldoshoes.com/",
+  "заголовок": "ALDO | ALDO Shoes, Boots, Sandals, Handbags & Accessories",
+  "защита": "",
+  "sale_ссылки": [
+   "Sale -> https://www.aldoshoes.com/collections/sale",
+   "Sale -> https://www.aldoshoes.com/collections/womens-sale",
+   "Extra 30% Off Sale -> https://www.aldoshoes.com/collections/mens-sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.4
+ },
+ {
+  "сайт": "Columbia",
+  "адрес": "https://www.columbia.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.columbia.com/",
+  "заголовок": "Attention Required! | Cloudflare",
+  "защита": "Attention Required",
+  "sale_ссылки": [],
+  "текст_страницы": 689,
+  "shopify": false,
+  "сек": 4.1
+ },
+ {
+  "сайт": "UGG",
+  "адрес": "https://www.ugg.com/eu",
+  "ответ": 406,
+  "итог_адрес": "https://www.ugg.com/eu",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 239,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "DKNY",
+  "адрес": "https://www.donnakaran.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.donnakaran.com/",
+  "заголовок": "Donna Karan - Official site and Online Store",
+  "защита": "Captcha",
+  "sale_ссылки": [
+   "SALE -> https://www.donnakaran.com/collections/sale",
+   "New Sale -> https://www.donnakaran.com/collections/new-sale",
+   "Last Chance -> https://www.donnakaran.com/collections/last-chance"
+  ],
+  "текст_страницы": 1777,
+  "shopify": true,
+  "сек": 5.3
+ },
+ {
+  "сайт": "Levi’s",
+  "адрес": "https://www.levi.com/US/en_US",
+  "ответ": 403,
+  "итог_адрес": "https://www.levi.com/US/en_US",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 202,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Tsubo",
+  "адрес": "http://www.tsubo.com",
+  "ошибка": "TimeoutError: Page.goto: Timeout 40000ms exceeded.\nCall log:\n  - navigating to \"http://www.tsubo.com/\", waiting until \"domcontentloade",
+  "сек": 40.0
+ },
+ {
+  "сайт": "GUESS",
+  "адрес": "https://www.guess.com/us/en/home",
+  "ответ": 403,
+  "итог_адрес": "https://www.guess.com/us/en/home",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 261,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Diesel",
+  "адрес": "https://shop.diesel.com/en",
+  "ответ": 200,
+  "итог_адрес": "https://diesel.com/en-us/",
+  "заголовок": "Diesel® US Official Site | Denim Jeans, Jackets, Shoes & Bags",
+  "защита": "",
+  "sale_ссылки": [
+   "Terms of Sale -> https://diesel.com/en-us/legal/terms-conditions.html"
+  ],
+  "текст_страницы": 2997,
+  "shopify": false,
+  "сек": 5.9
+ },
+ {
+  "сайт": "Nike",
+  "адрес": "https://www.nike.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.nike.com/",
+  "заголовок": "Nike. Just Do It. Nike.com",
+  "защита": "",
+  "sale_ссылки": [
+   "Sale Shoes -> https://www.nike.com/w/sale-shoes-3yaepzy7ok",
+   "Sale Clothing -> https://www.nike.com/w/sale-clothing-3yaepz6ymx6",
+   "Kids Sale -> https://www.nike.com/w/kids-sale-3yaepzv4dh"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 6.3
+ },
+ {
+  "сайт": "Adidas",
+  "адрес": "https://www.adidas.com/us",
+  "ответ": 403,
+  "итог_адрес": "https://www.adidas.com/us",
+  "заголовок": "adidas",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 1127,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "PUMA",
+  "адрес": "https://us.puma.com/us/en/home",
+  "ответ": 200,
+  "итог_адрес": "https://us.puma.com/us/en",
+  "заголовок": "PUMA.com | Clothing, Shoes, Accessories | PUMA US",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://us.puma.com/us/en/sale/womens-sale",
+   "SALE -> https://us.puma.com/us/en/sale/mens-sale",
+   "SALE -> https://us.puma.com/us/en/sale/kids-sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.0
+ },
+ {
+  "сайт": "Armani Exchange",
+  "адрес": "https://www.armaniexchange.com/us",
+  "ошибка": "Error: Page.goto: net::ERR_CERT_COMMON_NAME_INVALID at https://www.armaniexchange.com/us\nCall log:\n  - navigating to \"https://w",
+  "сек": 0.5
+ },
+ {
+  "сайт": "J.Crew",
+  "адрес": "https://www.jcrew.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.jcrew.com/",
+  "заголовок": "J.Crew: Clothes, Shoes & Accessories For Women, Men & Kids",
+  "защита": "",
+  "sale_ссылки": [
+   "Girls' Sale -> https://www.jcrew.com/sale/girls",
+   "Boys' Sale -> https://www.jcrew.com/sale/boys",
+   "SALE -> https://www.jcrew.com/sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 8.6
+ },
+ {
+  "сайт": "Guess Factory",
+  "адрес": "https://www.guessfactory.com/us/en/home/",
+  "ответ": 403,
+  "итог_адрес": "https://www.guess.com/en-us/guess/women/sale",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 261,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Uniqlo",
+  "адрес": "https://www.uniqlo.com/us/en",
+  "ответ": 403,
+  "итог_адрес": "https://www.uniqlo.com/us/en",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 201,
+  "shopify": false,
+  "сек": 4.5
+ },
+ {
+  "сайт": "Wrangler",
+  "адрес": "https://www.wrangler.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.wrangler.com/",
+  "заголовок": "Attention Required! | Cloudflare",
+  "защита": "Attention Required",
+  "sale_ссылки": [],
+  "текст_страницы": 689,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Armani",
+  "адрес": "https://www.armani.com/en-us",
+  "ответ": 200,
+  "итог_адрес": "https://www.armani.com/en-us/",
+  "заголовок": "Armani.com - Official Website | Armani US",
+  "защита": "",
+  "sale_ссылки": [
+   "Terms of sale -> https://www.armani.com/en-us/legal/terms-and-condition-sales/"
+  ],
+  "текст_страницы": 928,
+  "shopify": false,
+  "сек": 4.5
+ },
+ {
+  "сайт": "Danskin",
+  "адрес": "https://www.danskin.com/",
+  "ошибка": "Error: Page.goto: net::ERR_CERT_COMMON_NAME_INVALID at https://www.danskin.com/\nCall log:\n  - navigating to \"https://www.danski",
+  "сек": 0.2
+ },
+ {
+  "сайт": "Forever 21",
+  "адрес": "https://www.forever21.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.forever21.com/",
+  "заголовок": "Forever 21 | Shop The Latest Trends & Must-Have Styles",
+  "защита": "",
+  "sale_ссылки": [
+   "Women's Sale -> https://www.forever21.com/collections/womens-sale",
+   "Plus Sale -> https://www.forever21.com/collections/plus-size-sale",
+   "Men's Sale -> https://www.forever21.com/collections/mens-sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 4.6
+ },
+ {
+  "сайт": "6pm",
+  "адрес": "https://www.6pm.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.6pm.com/",
+  "заголовок": "Discount Shoes, Clothing & Accessories | 6pm",
+  "защита": "",
+  "sale_ссылки": [
+   "CLEARANCE -> https://www.6pm.com/null/4gIBMpIDC1s3MCBUTyAxMDBd.zso?s=recentSalesStyle/desc"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.1
+ },
+ {
+  "сайт": "Macy’s",
+  "адрес": "https://www.macys.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.macys.com/",
+  "заголовок": "Access Denied - Macy's",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 229,
+  "shopify": false,
+  "сек": 4.5
+ },
+ {
+  "сайт": "Joe’s New Balance Outlet",
+  "адрес": "https://www.joesnewbalanceoutlet.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.joesnewbalanceoutlet.com/",
+  "заголовок": "New Balance Shoes & Apparel | Official New BalanceÂ® Site",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 107,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "JomaShop",
+  "адрес": "https://www.jomashop.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.jomashop.com/",
+  "заголовок": "Watches For Men and Women, Handbags, Crystal, Pens - Jomashop",
+  "защита": "Captcha",
+  "sale_ссылки": [
+   "Sale -> https://www.jomashop.com/flash-sale-offers.html"
+  ],
+  "текст_страницы": 380,
+  "shopify": false,
+  "сек": 4.4
+ },
+ {
+  "сайт": "Saks Fifth Avenue",
+  "адрес": "https://www.saksoff5th.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.saksoff5th.com/",
+  "заголовок": "Site Offline",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 328,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Nordstrom",
+  "адрес": "https://www.nordstrom.com/",
+  "ответ": 200,
+  "итог_адрес": "https://siteclosed.nordstrom.com/invitation.html",
+  "заголовок": "Nordstrom",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 357,
+  "shopify": false,
+  "сек": 4.3
+ },
+ {
+  "сайт": "Nordstrom Rack",
+  "адрес": "https://www.nordstromrack.com/",
+  "ответ": 200,
+  "итог_адрес": "https://siteclosed.nordstromrack.com/invitation.html",
+  "заголовок": "Nordstrom",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 362,
+  "shopify": false,
+  "сек": 4.4
+ },
+ {
+  "сайт": "U.S. Polo Assn",
+  "адрес": "https://uspoloassn.com/ Популярный бренд спортивной и классической одежды, обуви и",
+  "ответ": 404,
+  "итог_адрес": "https://uspoloassn.com/%20%D0%9F%D0%BE%D0%BF%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D0%B9%20%D0%B1%D1%8",
+  "заголовок": "404 Not Found – U.S. Polo Assn.",
+  "защита": "",
+  "sale_ссылки": [
+   "Clearance -> https://uspoloassn.com/collections/clearance-all",
+   "Clearance -> https://uspoloassn.com/collections/clearance-boys"
+  ],
+  "текст_страницы": 2189,
+  "shopify": true,
+  "сек": 4.8
+ },
+ {
+  "сайт": "Just Fab",
+  "адрес": "https://www.justfab.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.justfab.com/",
+  "заголовок": "JustFab",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 4.6
+ },
+ {
+  "сайт": "DSW.com",
+  "адрес": "https://www.dsw.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.dsw.com/",
+  "заголовок": "Shoes: Women's, Men's & Kids Shoes from Top Brands | DSW",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 295,
+  "shopify": false,
+  "сек": 4.4
+ },
+ {
+  "сайт": "Karl Lagerfeld",
+  "адрес": "https://www.karllagerfeldparis.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.karllagerfeldparis.com/",
+  "заголовок": "Karl Lagerfeld Paris | 40% Off with Code FRIEND40",
+  "защита": "Captcha",
+  "sale_ссылки": [
+   "Sale -> https://www.karllagerfeldparis.com/collections/select-styles",
+   "Sale -> https://www.karllagerfeldparis.com/collections/mens-sale",
+   "Sale -> https://www.karllagerfeldparis.com/collections/bags-sale"
+  ],
+  "текст_страницы": 2686,
+  "shopify": true,
+  "сек": 5.4
+ },
+ {
+  "сайт": "Ray Ban",
+  "адрес": "https://www.ray-ban.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.ray-ban.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 195,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "ASOS",
+  "адрес": "https://www.asos.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.asos.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 194,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Marc Jacobs",
+  "адрес": "https://www.marcjacobs.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.marcjacobs.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 200,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "COACH Outlet",
+  "адрес": "https://www.coachoutlet.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.coach.com/shop/outlet",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 204,
+  "shopify": false,
+  "сек": 4.4
+ },
+ {
+  "сайт": "Juicy Couture",
+  "адрес": "https://juicycouture.com/",
+  "ответ": 200,
+  "итог_адрес": "https://juicycouture.com/",
+  "заголовок": "Juicy Couture® Official Site | Iconic Tracksuits, Perfume & More",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://juicycouture.com/collections/sale"
+  ],
+  "текст_страницы": 2537,
+  "shopify": true,
+  "сек": 5.6
+ },
+ {
+  "сайт": "The North Face",
+  "адрес": "https://www.thenorthface.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.thenorthface.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 202,
+  "shopify": false,
+  "сек": 4.1
+ },
+ {
+  "сайт": "Overstock",
+  "адрес": "https://www.overstock.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.overstock.com/",
+  "заголовок": "Bed Bath & Beyond | The Best Deals Online: Furniture, Bedding, Rugs, Kitchen Ess",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 70,
+  "shopify": false,
+  "сек": 4.3
+ },
+ {
+  "сайт": "Amazon",
+  "адрес": "https://www.amazon.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.amazon.com/",
+  "заголовок": "Amazon.com. Spend less. Smile more.",
+  "защита": "",
+  "sale_ссылки": [
+   "Today's Deals -> https://www.amazon.com/deals?ref_=nav_cs_gb"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 4.8
+ },
+ {
+  "сайт": "Ebay",
+  "адрес": "https://www.ebay.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.ebay.com/",
+  "заголовок": "Error Page | eBay",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 155,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Patagonia",
+  "адрес": "https://www.patagonia.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.patagonia.com/",
+  "заголовок": "Patagonia Outdoor Clothing & Gear",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 427,
+  "shopify": false,
+  "сек": 4.3
+ },
+ {
+  "сайт": "Foot Locker",
+  "адрес": "https://www.footlocker.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.footlocker.com/",
+  "заголовок": "Sneakers, Apparel & More | Foot Locker",
+  "защита": "",
+  "sale_ссылки": [
+   "Shop All Sale -> https://www.footlocker.com/category/sale.html",
+   "Top Rated on Sale -> https://www.footlocker.com/en/category/sale/top-rated-styles.html",
+   "All Men's Sale -> https://www.footlocker.com/category/sale/mens.html"
+  ],
+  "текст_страницы": 2992,
+  "shopify": false,
+  "сек": 5.7
+ },
+ {
+  "сайт": "WSS",
+  "адрес": "https://www.shopwss.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.shopwss.com/",
+  "заголовок": "Your Neighborhood Shoe Store | Sneakers, Shoes & Apparel | ShopWSS",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://www.shopwss.com/collections/on-sale",
+   "Best Deals -> https://www.shopwss.com/pages/best-values-always"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.3
+ },
+ {
+  "сайт": "Asphaltgold",
+  "адрес": "https://www.asphaltgold.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.asphaltgold.com/",
+  "заголовок": "Asphaltgold – Culture. Aesthetics. Dedication.",
+  "защита": "",
+  "sale_ссылки": [
+   "Sale -> https://www.asphaltgold.com/collections/sale",
+   "Sale ab 20% Rabatt -> https://www.asphaltgold.com/collections/sale-ab-20",
+   "Sale ab 30% Rabatt -> https://www.asphaltgold.com/collections/sale-ab-30"
+  ],
+  "текст_страницы": 2999,
+  "shopify": true,
+  "сек": 5.7
+ },
+ {
+  "сайт": "JD Sports",
+  "адрес": "https://www.jdsports.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.jdsports.com/",
+  "заголовок": "",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 667,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "KICKS CREW",
+  "адрес": "https://www.kickscrew.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.kickscrew.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 265,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Zappos",
+  "адрес": "https://www.zappos.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.zappos.com/",
+  "заголовок": "Shoes, Sneakers, Boots, & Clothing + FREE SHIPPING | Zappos.com",
+  "защита": "",
+  "sale_ссылки": [
+   "Sale -> https://www.zappos.com/null/4AEB4gIBHA.zso",
+   "All Women's Sale -> https://www.zappos.com/women-on-sale/wAEB4AEB4gICGBw.zso",
+   "All Men's Sale -> https://www.zappos.com/men-on-sale/wAEC4AEB4gICGBw.zso"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.4
+ },
+ {
+  "сайт": "Zalando Outlet",
+  "адрес": "https://www.zalando-lounge.com/selectcountry",
+  "ошибка": "Error: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.zalando-lounge.com/selectcountry\nCall log:\n  - navigating to \"ht",
+  "сек": 0.6
+ },
+ {
+  "сайт": "Cettire",
+  "адрес": "https://www.cettire.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.cettire.com/",
+  "заголовок": "cettire.com",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 0,
+  "shopify": false,
+  "сек": 4.3
+ },
+ {
+  "сайт": "SSENSE",
+  "адрес": "https://www.ssense.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.ssense.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 262,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "YOOX",
+  "адрес": "https://www.yoox.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.yoox.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 194,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Finish Line",
+  "адрес": "https://www.finishline.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.finishline.com/",
+  "заголовок": "",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 667,
+  "shopify": false,
+  "сек": 4.1
+ },
+ {
+  "сайт": "Sephora",
+  "адрес": "https://www.sephora.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.sephora.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 197,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Yves Rocher",
+  "адрес": "https://www.yvesrocherusa.com/",
+  "ответ": 200,
+  "итог_адрес": "https://yvesrocherusa.com/",
+  "заголовок": "Yves Rocher: Natural Beauty Products",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://yvesrocherusa.com/collections/sale"
+  ],
+  "текст_страницы": 2998,
+  "shopify": true,
+  "сек": 4.9
+ },
+ {
+  "сайт": "iHerb",
+  "адрес": "https://iherb.com/",
+  "ответ": 403,
+  "итог_адрес": "https://iherb.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 257,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Bath & Body Works",
+  "адрес": "https://www.bathandbodyworks.com/",
+  "ответ": 307,
+  "итог_адрес": "https://www.bathandbodyworks.com/",
+  "заголовок": "Access to this page has been denied",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 106,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Anastasia Beverly Hills",
+  "адрес": "https://www.anastasiabeverlyhills.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.anastasiabeverlyhills.com/",
+  "заголовок": "Anastasia Beverly Hills Cosmetics & Beauty | Official Website",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://www.anastasiabeverlyhills.com/collections/sales-offers"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 6.2
+ },
+ {
+  "сайт": "Kiehl’s",
+  "адрес": "https://www.kiehls.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.kiehls.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 262,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Walgreens",
+  "адрес": "https://www.walgreens.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.walgreens.com/",
+  "заголовок": "Walgreens: Pharmacy, Health & Wellness, Photo & More for You",
+  "защита": "",
+  "sale_ссылки": [
+   "Online Clearance -> https://www.walgreens.com/search/results.jsp?Ntt=Clearance&ban=dl_dlsp_ShopProducts_Clearance",
+   "Sale -> https://www.walgreens.com/store/store/save/sale.jsp?ban=dl_dlsp_ShopProducts_Sale",
+   "Deals & Rewards -> https://www.walgreens.com/shop#shop-deals-hub-container"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 4.8
+ },
+ {
+  "сайт": "MAC",
+  "адрес": "https://www.maccosmetics.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.maccosmetics.com/",
+  "заголовок": "MAC Cosmetics | Beauty and Makeup Products - Official Site",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://www.maccosmetics.com/collections/sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 4.5
+ },
+ {
+  "сайт": "Beautylish",
+  "адрес": "https://www.beautylish.com/",
+  "ответ": 405,
+  "итог_адрес": "https://www.beautylish.com/",
+  "заголовок": "Human Verification",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 318,
+  "shopify": false,
+  "сек": 4.4
+ },
+ {
+  "сайт": "e.l.f.",
+  "адрес": "https://www.elfcosmetics.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.elfcosmetics.com/",
+  "заголовок": "e.l.f. Cosmetics: Affordable Makeup & Skincare - Cruelty Free | e.l.f. Cosmetics",
+  "защита": "",
+  "sale_ссылки": [
+   "Black Friday Deals -> https://www.elfcosmetics.com/pages/black-friday-deals",
+   "Cyber Monday Deals -> https://www.elfcosmetics.com/pages/cyber-monday-deals"
+  ],
+  "текст_страницы": 2994,
+  "shopify": true,
+  "сек": 4.6
+ },
+ {
+  "сайт": "Too Faced",
+  "адрес": "https://www.toofaced.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.toofaced.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 198,
+  "shopify": false,
+  "сек": 4.6
+ },
+ {
+  "сайт": "Tarte",
+  "адрес": "https://tartecosmetics.com/",
+  "ответ": 200,
+  "итог_адрес": "https://tartecosmetics.com/",
+  "заголовок": "High-Performance Makeup & Beauty Products | Tarte™",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://tartecosmetics.com/collections/sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 6.0
+ },
+ {
+  "сайт": "Bobbi Brown",
+  "адрес": "https://www.bobbibrowncosmetics.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.bobbibrowncosmetics.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 209,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Sleek Shop",
+  "адрес": "https://sleekshop.com/",
+  "ответ": 200,
+  "итог_адрес": "https://sleekshop.com/",
+  "заголовок": "Sleekshop: Pro Hair Color, K-Beauty, J-Beauty & Cosmetics",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 4.6
+ },
+ {
+  "сайт": "Besame Cosmetics",
+  "адрес": "https://besamecosmetics.com/",
+  "ответ": 200,
+  "итог_адрес": "https://besamecosmetics.com/",
+  "заголовок": "Bésame Cosmetics | Luxury Color Cosmetics – Besame Cosmetics",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.3
+ },
+ {
+  "сайт": "Sally Beauty",
+  "адрес": "https://www.sallybeauty.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.sallybeauty.com/on/demandware.store/Sites-SA-Site/default/PX-Show?url=aHR0cHM6Ly93d3cuc2",
+  "заголовок": "Access to this page has been denied.",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 871,
+  "shopify": false,
+  "сек": 4.6
+ },
+ {
+  "сайт": "Benefit",
+  "адрес": "https://www.benefitcosmetics.com/en-us",
+  "ответ": 200,
+  "итог_адрес": "https://www.benefitcosmetics.com/en-us",
+  "заголовок": "Makeup, Pore Care, & Beauty Services | Benefit Cosmetics",
+  "защита": "",
+  "sale_ссылки": [
+   "Sale -> https://www.benefitcosmetics.com/en-us/shop-sale",
+   "Sale -> https://www.benefitcosmetics.com/en-us/sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.7
+ },
+ {
+  "сайт": "Brilliance New York",
+  "адрес": "https://www.brilliancenewyork.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.brilliancenewyork.com/",
+  "заголовок": "Flat Irons, Curling Irons,Blow Dryers & Hair Care| Brilliance New York",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.4
+ },
+ {
+  "сайт": "DermStore",
+  "адрес": "https://www.dermstore.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.dermstore.com/",
+  "заголовок": "Dermstore: Skin Care, Sunscreen, Hair, & Beauty Products",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE & OFFERS -> https://www.dermstore.com/c/sale/",
+   "BeautyFIX Sale -> https://www.dermstore.com/c/beautyfix/offers/"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 4.5
+ },
+ {
+  "сайт": "Clinique",
+  "адрес": "https://www.clinique.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.clinique.com/",
+  "заголовок": "Clinique®| Limited Time: 30% Off Sitewide + 35% Off for Members*",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.4
+ },
+ {
+  "сайт": "EOS",
+  "адрес": "https://evolutionofsmooth.com/",
+  "ответ": 200,
+  "итог_адрес": "https://evolutionofsmooth.com/",
+  "заголовок": "eos Body Care, Shave & Lip Balm Must-Haves",
+  "защита": "",
+  "sale_ссылки": [
+   "SALE -> https://evolutionofsmooth.com/collections/sale"
+  ],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.1
+ },
+ {
+  "сайт": "Bliss",
+  "адрес": "https://www.blissworld.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.blissworld.com/",
+  "заголовок": "Skin Care & Beauty Products | 100% Cruelty-Free | Bliss – Bliss World Store",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 2949,
+  "shopify": true,
+  "сек": 4.7
+ },
+ {
+  "сайт": "Nars",
+  "адрес": "https://www.narscosmetics.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.narscosmetics.com/",
+  "заголовок": "NARS Cosmetics | The Official Store | Makeup and Skincare",
+  "защита": "",
+  "sale_ссылки": [
+   "LAST CHANCE -> https://www.narscosmetics.com/USA/last-chance"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 6.5
+ },
+ {
+  "сайт": "Kiko",
+  "адрес": "https://www.kikocosmetics.com/",
+  "ответ": 200,
+  "итог_адрес": "https://us.kikocosmetics.com/",
+  "заголовок": "Italian Make-Up & Cosmetics Online | KIKO MILANO",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.5
+ },
+ {
+  "сайт": "Feel Unique",
+  "адрес": "https://www.feelunique.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.feelunique.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 200,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Apple",
+  "адрес": "https://www.apple.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.apple.com/",
+  "заголовок": "Apple",
+  "защита": "",
+  "sale_ссылки": [
+   "Carrier Deals at Apple -> https://www.apple.com/us/shop/goto/buy_iphone/carrier_offers"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 4.5
+ },
+ {
+  "сайт": "Walmart",
+  "адрес": "https://www.walmart.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.walmart.com/",
+  "заголовок": "Walmart | Save Money. Live better.",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 4.7
+ },
+ {
+  "сайт": "B&H Photo Video",
+  "адрес": "https://www.bhphotovideo.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.bhphotovideo.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 268,
+  "shopify": false,
+  "сек": 4.3
+ },
+ {
+  "сайт": "Samsung",
+  "адрес": "https://www.samsung.com/us/",
+  "ответ": 200,
+  "итог_адрес": "https://www.samsung.com/us/",
+  "заголовок": "Samsung US | Mobile | TV | Home Electronics | Home Appliances | Samsung US",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.5
+ },
+ {
+  "сайт": "Lenovo",
+  "адрес": "https://www.lenovo.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.lenovo.com/us/en/",
+  "заголовок": "Lenovo Official Site | Laptops, Desktop PCs, Tablets, Monitors | Lenovo US",
+  "защита": "",
+  "sale_ссылки": [
+   "Deals -> https://www.lenovo.com/us/en/d/deals/doorbusters/",
+   "Shop the Outlet -> https://www.lenovo.com/us/outletus/en/",
+   "Outlet -> https://www.lenovo.com/us/outletus/en/laptops/"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.1
+ },
+ {
+  "сайт": "iRobot",
+  "адрес": "https://www.irobot.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.irobot.com/",
+  "заголовок": "iRobot®: Robot Vacuums and Mops",
+  "защита": "",
+  "sale_ссылки": [
+   "Deals -> https://www.irobot.com/en_US/black-friday-deals.html",
+   "Accessory Deals & Offers -> https://www.irobot.com/en_US/accessories.html#accessory-deals"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.1
+ },
+ {
+  "сайт": "Musician’s Friend",
+  "адрес": "https://www.musiciansfriend.com/",
+  "ответ": 200,
+  "итог_адрес": "https://www.musiciansfriend.com/",
+  "заголовок": "Musician's Friend: Musical Instruments Store",
+  "защита": "",
+  "sale_ссылки": [
+   "Pre-Black Friday Deals -> https://www.musiciansfriend.com/deals?icid=223991",
+   "Guitar Deals -> https://www.musiciansfriend.com/guitar-deals",
+   "Bass Deals -> https://www.musiciansfriend.com/bass-deals"
+  ],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.3
+ },
+ {
+  "сайт": "Dell",
+  "адрес": "https://www.dell.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.dell.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 194,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Digi-Key",
+  "адрес": "https://www.digikey.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.digikey.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 263,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "NewEgg",
+  "адрес": "https://www.newegg.com/",
+  "ответ": 403,
+  "итог_адрес": "https://www.newegg.com/",
+  "заголовок": "Just a moment...",
+  "защита": "Just a moment",
+  "sale_ссылки": [],
+  "текст_страницы": 262,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Estée Lauder",
+  "адрес": "https://www.esteelauder.com",
+  "ответ": 403,
+  "итог_адрес": "https://www.esteelauder.com/",
+  "заголовок": "Access Denied",
+  "защита": "Access Denied",
+  "sale_ссылки": [],
+  "текст_страницы": 201,
+  "shopify": false,
+  "сек": 4.2
+ },
+ {
+  "сайт": "Charlotte Tilbury",
+  "адрес": "https://www.charlottetilbury.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.charlottetilbury.com/us",
+  "заголовок": "Shop Luxury Makeup, Skincare & Fragrance | Charlotte Tilbury",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": false,
+  "сек": 5.4
+ },
+ {
+  "сайт": "Rhode",
+  "адрес": "https://www.rhodeskin.com",
+  "ответ": 200,
+  "итог_адрес": "https://www.rhodeskin.com/",
+  "заголовок": "rhode skin by hailey rhode bieber",
+  "защита": "",
+  "sale_ссылки": [],
+  "текст_страницы": 3000,
+  "shopify": true,
+  "сек": 5.9
+ }
+]
