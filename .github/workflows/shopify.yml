@@ -119,6 +119,10 @@ jobs:
           SHOPIFY = {
               "wss": ("WSS", "https://www.shopwss.com", "/collections/on-sale"),
               "asphaltgold": ("Asphaltgold", "https://www.asphaltgold.com", "/collections/sale"),
+              "aldo": ("ALDO", "https://www.aldoshoes.com", "/collections/sale"),
+              "shoebacca_men": ("Shoebacca (мужское)", "https://www.shoebacca.com", "/collections/mens-sale"),
+              "shoebacca_women": ("Shoebacca (женское)", "https://www.shoebacca.com", "/collections/womens-sale"),
+              "juicy": ("Juicy Couture", "https://juicycouture.com", "/collections/sale"),
           }
 
           ТОП_CSV = 50        # сколько лучших по скидке класть в маленький top_<ключ>.csv для таблицы
