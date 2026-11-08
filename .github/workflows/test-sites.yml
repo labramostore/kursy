@@ -1,0 +1,111 @@
+# ТЕСТ: какие сайты магазинов открываются с серверов GitHub. Ничего не меняет в репозитории.
+name: Тест сайтов
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install playwright
+      - name: Проверить сайты
+        run: |
+          cat > s.py <<'PYEOF'
+          """Проверка: открываются ли сайты магазинов в настоящем Chrome и где у них раздел Sale.
+
+          Не собирает товары. Для каждого сайта печатает: ответ, итоговый адрес, заголовок, признаки защиты
+          (капча, «доступ запрещён», проверка браузера) и до 3 ссылок на Sale/Clearance/Outlet.
+          Капчи и защиту не обходит: если сайт не пустил, так и пишем.
+
+          Запуск:  venv/bin/python проверка_сайтов.py [файл_результата.json]
+          """
+          import json
+          import re
+          import sys
+          import time
+
+          from playwright.sync_api import sync_playwright
+
+          SITES = [
+              ("Foot Locker", "https://www.footlocker.com"),
+              ("Joe's New Balance Outlet", "https://www.joesnewbalanceoutlet.com"),
+              ("WSS", "https://www.shopwss.com"),
+              ("Asphaltgold", "https://www.asphaltgold.com"),
+              ("JD Sports", "https://www.jdsports.com"),
+              ("KICKS CREW", "https://www.kickscrew.com"),
+              ("Zappos", "https://www.zappos.com"),
+              ("Zalando Outlet", "https://www.zalando-lounge.com/selectcountry"),
+              ("Macy's", "https://www.macys.com"),
+              ("Nordstrom", "https://www.nordstrom.com"),
+              ("Nordstrom Rack", "https://www.nordstromrack.com"),
+              ("ASOS", "https://www.asos.com"),
+              ("Cettire", "https://www.cettire.com"),
+              ("SSENSE", "https://www.ssense.com"),
+              ("YOOX", "https://www.yoox.com"),
+              ("Finish Line", "https://www.finishline.com"),
+              ("Saks OFF 5TH", "https://www.saksoff5th.com"),
+          ]
+
+          BLOCK = re.compile(r"captcha|are you a robot|access denied|verify you are human|just a moment|px-captcha|"
+                             r"unusual traffic|pardon our interruption|request blocked|bot detection|"
+                             r"checking your browser|attention required", re.I)
+          SALE = re.compile(r"\b(sale|clearance|outlet|markdown|deals|last chance|распродаж)\b", re.I)
+
+          JS_LINKS = """() => [...document.querySelectorAll('a[href]')].map(a => [(a.innerText||'').trim().slice(0,40), a.href])
+              .filter(x => x[0] && x[0].length < 30)"""
+
+
+          def check(pg, name, url):
+              t0 = time.time()
+              r = {"сайт": name, "адрес": url}
+              try:
+                  resp = pg.goto(url, wait_until="domcontentloaded", timeout=40000)
+                  pg.wait_for_timeout(4000)
+                  r["ответ"] = resp.status if resp else None
+                  r["итог_адрес"] = pg.url[:100]
+                  r["заголовок"] = (pg.title() or "")[:80]
+                  text = pg.evaluate("document.body ? document.body.innerText.slice(0, 3000) : ''")
+                  m = BLOCK.search(f"{r['заголовок']} {text}")
+                  r["защита"] = m.group(0) if m else ""
+                  host = re.sub(r"^https?://(www\.)?", "", url).split("/")[0].split(".")[-2]
+                  links = [x for x in pg.evaluate(JS_LINKS) if SALE.search(x[0]) and host in x[1]]
+                  seen, out = set(), []
+                  for t, h in links:
+                      if h not in seen:
+                          seen.add(h)
+                          out.append(f"{t} -> {h[:110]}")
+                  r["sale_ссылки"] = out[:3]
+                  r["текст_страницы"] = len(text)
+              except Exception as e:
+                  r["ошибка"] = f"{type(e).__name__}: {str(e)[:120]}"
+              r["сек"] = round(time.time() - t0, 1)
+              return r
+
+
+          def main():
+              out = sys.argv[1] if len(sys.argv) > 1 else None
+              results = []
+              with sync_playwright() as p:
+                  b = p.chromium.launch(channel="chrome", headless=True)
+                  for name, url in SITES:
+                      ctx = b.new_context(locale="en-US", viewport={"width": 1366, "height": 900})
+                      pg = ctx.new_page()
+                      r = check(pg, name, url)
+                      ctx.close()
+                      results.append(r)
+                      flag = "ОШИБКА" if "ошибка" in r else ("ЗАЩИТА:" + r["защита"] if r.get("защита") else "ок")
+                      print(f"{name:26} {str(r.get('ответ')):>4} {flag:28} {r['сек']:>5}с  sale: {len(r.get('sale_ссылки', []))}", flush=True)
+                  b.close()
+              if out:
+                  json.dump(results, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+                  print("сохранено:", out)
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF
+          python s.py
