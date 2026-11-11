@@ -1,12 +1,15 @@
 # Реле курса Т-Банка. Работает в облаке GitHub, Mac включать не нужно.
-# Раз в день берёт публичный курс доллара (банк продаёт, категория переводов, как в приложении),
-# сверяет с курсом ЦБ и кладёт в файл rate.json. Таблица Google читает этот файл.
-# Проверка сертификата отключена только для этого одного запроса публичного курса (у Т-Банка
-# российский корневой сертификат). Подмену ловит сверка с ЦБ: допуск 15%.
+# Каждый час берёт публичный курс доллара и евро (банк продаёт, категория переводов, как в приложении),
+# сверяет с курсом ЦБ и кладёт в файл rate.json. Таблица Google, бот и посты читают этот файл.
+# Поля sell и cbr (доллар) остались прежними, чтобы ничего не сломалось. Добавлены eur_sell и eur_cbr.
+# Проверка сертификата ВКЛЮЧЕНА. У api.tbank.ru российский корневой сертификат (Минцифры), поэтому он
+# лежит в репозитории файлом russian_root_ca.pem и подключается только к этим запросам к Т-Банку
+# (на сам Mac и браузеры он не ставится). Перед запросом скрипт сверяет отпечаток файла SHA-256 с
+# эталоном, а курс сверяет с курсом ЦБ: допуск 15%.
 name: Курс Т-Банка
 on:
   schedule:
-    - cron: '20 7 * * *'   # 07:20 UTC = 12:20 по Астане
+    - cron: '20 * * * *'   # каждый час в :20
   workflow_dispatch:
 permissions:
   contents: write
@@ -18,19 +21,28 @@ jobs:
       - name: Взять курс
         run: |
           python3 - <<'EOF'
-          import json, ssl, urllib.request, datetime
+          import json, ssl, hashlib, urllib.request, datetime
+          PEM = "russian_root_ca.pem"
+          SHA256 = "d26d2d0231b7c39f92cc738512ba54103519e4405d68b5bd703e9788ca8ecf31"
+          der = ssl.PEM_cert_to_DER_cert(open(PEM).read())
+          assert hashlib.sha256(der).hexdigest() == SHA256, "отпечаток сертификата не совпал, остановка"
           ctx = ssl.create_default_context()
-          ctx.check_hostname = False
-          ctx.verify_mode = ssl.CERT_NONE
-          req = urllib.request.Request("https://api.tbank.ru/v1/currency_rates?from=USD&to=RUB",
-                                       headers={"User-Agent": "Mozilla/5.0"})
-          data = json.loads(urllib.request.urlopen(req, timeout=40, context=ctx).read())
-          rates = {x["category"]: x for x in data["payload"]["rates"]}
-          sell = float(rates["DebitCardsTransfers"]["sell"])
-          cbr = float(json.loads(urllib.request.urlopen(
-              "https://www.cbr-xml-daily.ru/daily_json.js", timeout=40).read())["Valute"]["USD"]["Value"])
-          assert abs(sell - cbr) / cbr < 0.15, f"курс {sell} слишком далёк от курса ЦБ {cbr}"
-          out = {"sell": sell, "cbr": cbr, "date": datetime.date.today().isoformat(),
+          ctx.load_verify_locations(cafile=PEM)
+          cbr_all = json.loads(urllib.request.urlopen(
+              "https://www.cbr-xml-daily.ru/daily_json.js", timeout=40).read())["Valute"]
+          def tbank(cur):
+              req = urllib.request.Request("https://api.tbank.ru/v1/currency_rates?from=%s&to=RUB" % cur,
+                                           headers={"User-Agent": "Mozilla/5.0"})
+              data = json.loads(urllib.request.urlopen(req, timeout=40, context=ctx).read())
+              rates = {x["category"]: x for x in data["payload"]["rates"]}
+              sell = float(rates["DebitCardsTransfers"]["sell"])
+              cbr = float(cbr_all[cur]["Value"])
+              assert abs(sell - cbr) / cbr < 0.15, "курс %s %s слишком далёк от курса ЦБ %s" % (cur, sell, cbr)
+              return sell, cbr
+          usd, usd_cbr = tbank("USD")
+          eur, eur_cbr = tbank("EUR")
+          out = {"sell": usd, "cbr": usd_cbr, "eur_sell": eur, "eur_cbr": eur_cbr,
+                 "date": datetime.date.today().isoformat(),
                  "source": "api.tbank.ru, DebitCardsTransfers, sell"}
           json.dump(out, open("rate.json", "w"), ensure_ascii=False, indent=1)
           print(out)
