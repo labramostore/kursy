@@ -165,9 +165,18 @@ jobs:
               # добавлено 14.11.2026
               "burker": ("Burker (часы)", "https://www.burkerwatches.com", "/collections/sale"),
               "laphont": ("Laphont", "https://laphont.com", "/en-us/collections/sale"),  # без /en-us цены не американские (сверено 14.11)
-              "evo": ("evo", "https://www.evo.com", "/collections/sale"),
+              # evo: одежда, рюкзаки (решение Ильи 14.11). Аксессуары и беговое Илья тоже хочет, но эти разделы evo
+              # строит сторонний поиск (Constructor), в products.json их нет — нужен отдельный способ. Лыжи/борды/велики/детское не берём
+              "evo_men": ("evo (мужская одежда)", "https://www.evo.com", "/collections/mens-clothing-sale"),
+              "evo_women": ("evo (женская одежда)", "https://www.evo.com", "/collections/womens-clothing-sale"),
+              "evo_bags": ("evo (рюкзаки и чемоданы)", "https://www.evo.com", "/collections/bags-backpacks-luggage-sale"),
               "uspa": ("U.S. Polo Assn", "https://uspoloassn.com", "/collections/clearance-all"),
           }
+
+          # Что не берём только на отдельных сайтах (слова в названии и типе товара). Общие правила — в правила_отбора.py
+          # evo: шлемы и горнолыжные/сноубордические маски не берём; обычные очки и сноубордические куртки берём (Илья, 14.11)
+          НЕ_БРАТЬ_НА_САЙТЕ = {k: ["helmet", "goggle", "replacement lens"] for k in
+                               ("evo_men", "evo_women", "evo_bags")}
 
           COUNTRY = {"burker": "DE"}  # Burker отдаёт только евро, даже при запросе США      # страна по ключу сайта; по умолчанию US (доллары). Для немецких версий: "key": "DE" (евро)
           МАКС_ТОВАРОВ = 100  # лучших по скидке с одного сайта (решение Ильи 12.11: 100, потому что каждый день берём один магазин и из него топ-10…20 для сторис)
@@ -319,6 +328,8 @@ jobs:
                               continue
                           stat["со_скидкой"] += 1
                           why = правила_отбора.причина_отказа(row["название"], f"{row['тип']} {row['теги']}")
+                          text = f"{row['название']} {row['тип']}".lower()
+                          why = why or next((w for w in НЕ_БРАТЬ_НА_САЙТЕ.get(key, []) if w in text), "")
                           if why or размеры_фильтр.широкая(row["название"], row["тип"]):
                               stat["отсеяно_правилами"] += 1
                               continue
