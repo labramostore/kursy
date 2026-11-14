@@ -123,8 +123,54 @@ jobs:
               "shoebacca_men": ("Shoebacca (мужское)", "https://www.shoebacca.com", "/collections/mens-sale"),
               "shoebacca_women": ("Shoebacca (женское)", "https://www.shoebacca.com", "/collections/womens-sale"),
               "juicy": ("Juicy Couture", "https://juicycouture.com", "/collections/sale"),
+              "dkny": ("DKNY", "https://www.donnakaran.com", "/collections/sale"),
+              "alo": ("Alo Yoga", "https://www.aloyoga.com", "/collections/womens-sale-all"),
+              "forever21_women": ("Forever 21 (женское)", "https://www.forever21.com", "/collections/womens-sale"),
+              "forever21_men": ("Forever 21 (мужское)", "https://www.forever21.com", "/collections/mens-sale"),
+              "justfab": ("Just Fab", "https://www.justfab.com", "/collections/sale-clearance-all"),
+              "karl": ("Karl Lagerfeld", "https://www.karllagerfeldparis.com", "/collections/mens-sale"),
+              "yvesrocher": ("Yves Rocher", "https://yvesrocherusa.com", "/collections/sale"),
+              "abh": ("Anastasia Beverly Hills", "https://www.anastasiabeverlyhills.com", "/collections/sales-offers"),
+              "mac": ("MAC", "https://www.maccosmetics.com", "/collections/sale"),
+              "tarte": ("Tarte", "https://tartecosmetics.com", "/collections/sale"),
+              "eos": ("EOS", "https://evolutionofsmooth.com", "/collections/sale"),
+              "jwpei": ("JW PEI", "https://www.jwpei.com", "/collections/clearance"),
+              "end": ("END. Clothing", "https://www.endclothing.com", "/en-us/collections/sale"),
+              "stevemadden_women": ("Steve Madden (женское)", "https://www.stevemadden.com", "/collections/womens-clearance"),
+              "stevemadden_men": ("Steve Madden (мужское)", "https://www.stevemadden.com", "/collections/mens-sale"),
+              "stevemadden_bags": ("Steve Madden (сумки, аксессуары)", "https://www.stevemadden.com", "/collections/bags-accessories-sale"),
+              "ashford": ("Ashford (часы)", "https://www.ashford.com", "/collections/clearance"),
+              "champion": ("Champion", "https://www.champion.com", "/collections/all-sale"),
+              "shoepalace": ("Shoe Palace", "https://www.shoepalace.com", "/collections/sale"),
+              "reebok": ("Reebok", "https://www.reebok.com", "/collections/sale"),
+              "shopsimon": ("Shop Simon (outlet)", "https://shop.simon.com", "/collections/curated-outlet"),
+              "shopsimon_coach": ("Shop Simon (Coach Outlet)", "https://shop.simon.com", "/collections/store-coach-outlet"),
+              "shopsimon_mk": ("Michael Kors Outlet (через Shop Simon)", "https://shop.simon.com", "/collections/store-michael-kors-outlet"),
+              "simon_adidas": ("adidas (через Shop Simon)", "https://shop.simon.com", "/collections/store-adidas"),
+              "simon_calvinklein": ("Calvin Klein (через Shop Simon)", "https://shop.simon.com", "/collections/store-calvin-klein"),
+              "simon_footlocker": ("Foot Locker (через Shop Simon)", "https://shop.simon.com", "/collections/store-foot-locker"),
+              "simon_guessfactory": ("Guess Factory (через Shop Simon)", "https://shop.simon.com", "/collections/store-guess-factory"),
+              "simon_hugoboss": ("HUGO BOSS (через Shop Simon)", "https://shop.simon.com", "/collections/store-hugo-boss"),
+              "simon_newbalance": ("New Balance (через Shop Simon)", "https://shop.simon.com", "/collections/store-new-balance"),
+              "simon_marcjacobs": ("Marc Jacobs (через Shop Simon)", "https://shop.simon.com", "/collections/store-marc-jacobs"),
+              "simon_drmartens": ("Dr. Martens (через Shop Simon)", "https://shop.simon.com", "/collections/store-dr-martens"),
+              "simon_clarks": ("Clarks (через Shop Simon)", "https://shop.simon.com", "/collections/store-clarks-shoes"),
+              "simon_hoka": ("HOKA (через Shop Simon)", "https://shop.simon.com", "/collections/store-hoka"),
+              "simon_lululemon": ("Lululemon (через Shop Simon)", "https://shop.simon.com", "/collections/store-lululemon"),
+              "simon_birkenstock": ("Birkenstock (через Shop Simon)", "https://shop.simon.com", "/collections/store-birkenstock"),
+              "simon_crocs": ("Crocs (через Shop Simon)", "https://shop.simon.com", "/collections/store-crocs"),
+              "simon_anthropologie": ("Anthropologie (через Shop Simon)", "https://shop.simon.com", "/collections/store-anthropologie"),
+              "simon_fossil": ("Fossil (через Shop Simon)", "https://shop.simon.com", "/collections/store-fossil"),
+              "simon_brooksbrothers": ("Brooks Brothers (через Shop Simon)", "https://shop.simon.com", "/collections/store-brooks-brothers"),
+              # добавлено 14.11.2026
+              "burker": ("Burker (часы)", "https://www.burkerwatches.com", "/collections/sale"),
+              "laphont": ("Laphont", "https://laphont.com", "/en-us/collections/sale"),  # без /en-us цены не американские (сверено 14.11)
+              "evo": ("evo", "https://www.evo.com", "/collections/sale"),
+              "uspa": ("U.S. Polo Assn", "https://uspoloassn.com", "/collections/clearance-all"),
           }
 
+          COUNTRY = {"burker": "DE"}  # Burker отдаёт только евро, даже при запросе США      # страна по ключу сайта; по умолчанию US (доллары). Для немецких версий: "key": "DE" (евро)
+          МАКС_ТОВАРОВ = 100  # лучших по скидке с одного сайта (решение Ильи 12.11: 100, потому что каждый день берём один магазин и из него топ-10…20 для сторис)
           ТОП_CSV = 50        # сколько лучших по скидке класть в маленький top_<ключ>.csv для таблицы
           PORTION = 50
           MAX_PAGES = 100     # потолок: 5000 товаров на сайт за прогон (если упрёмся, в сводке будет «потолок»)
@@ -171,7 +217,8 @@ jobs:
                       sale_vars.append((now, was, v))
               if not sale_vars:
                   return None
-              now, was, v0 = min(sale_vars, key=lambda t: t[0])
+              # Цена как на странице магазина: первый вариант в наличии (у DKNY у больших размеров цена другая, самую низкую брать нельзя)
+              now, was, v0 = sale_vars[0]
               label = lambda v, i: (v.get(f"option{i + 1}") or "").strip()
               sizes = []
               if si is not None:
@@ -183,7 +230,21 @@ jobs:
                           sizes.append([s, s, bool(v.get("available"))])
                   sizes = [s for s in sizes if размеры_фильтр.обычные([s[0]]) == [s[0]]]
               title = p["title"]
+              tags_l = p.get("tags") if isinstance(p.get("tags"), list) else []
+              promo, official = [], ""
+              for tg in tags_l:
+                  if tg.startswith("product-url_"):
+                      official = tg[len("product-url_"):].split("?")[0]  # адрес товара на официальном сайте (у Shop Simon)
+                  m = re.match(r"promo_(.+?)_(\d\d?/\d\d?/\d{4})_(\d\d?/\d\d?/\d{4})", tg)
+                  if m:
+                      try:
+                          d0 = datetime.strptime(m.group(2), "%m/%d/%Y").date(); d1 = datetime.strptime(m.group(3), "%m/%d/%Y").date()
+                          if d0 <= date.today() <= d1:
+                              promo.append(m.group(1).strip())  # только действующие сегодня акции из тегов
+                      except ValueError:
+                          pass
               return {
+                  "промо": " ; ".join(promo), "ссылка_официальная": official,
                   "артикул": f"{key}-{p['id']}",
                   "название": title,
                   "тип": p.get("product_type", "") or "",
@@ -212,21 +273,29 @@ jobs:
                   w = csv.writer(f)
                   w.writerow(cols)
                   for r in rows[:ТОП_CSV]:
-                      sizes = ", ".join(s[0] for s in r["размеры"] if s[2])
+                      sizes = " | ".join(s[0] for s in r["размеры"] if s[2])  # не запятая: таблица склеивает «10, 11» в число
                       w.writerow([r["дата_сбора"], r["магазин"], r["артикул"], r["название"], r["тип"], r["цвет"],
-                                  r["цена_сейчас"], r["цена_была"], r["валюта"], r["ссылка"], r["картинка"], sizes, now])
+                                  f'{r["цена_сейчас"]:.2f}', f'{r["цена_была"]:.2f}', r["валюта"], r["ссылка"], r["картинка"], sizes, now])
 
 
           def collect(browser, key):
               shop, base, path = SHOPIFY[key]
-              pg = browser.new_context(locale="en-US", viewport={"width": 1366, "height": 900}).new_page()
+              ctx = browser.new_context(locale="en-US", viewport={"width": 1366, "height": 900})
+              host = re.sub(r"^https?://", "", base).split("/")[0]
+              # Сайт сам решает по адресу, какую страну показать (у нас это Казахстан, тенге). Просим США.
+              ctx.add_cookies([{"name": "localization", "value": COUNTRY.get(key, "US"), "domain": host, "path": "/"}])
+              pg = ctx.new_page()
               stat = {"сайт": shop, "ключ": key, "страниц": 0, "товаров_всего": 0, "со_скидкой": 0, "отсеяно_правилами": 0}
               try:
-                  resp = pg.goto(base + path, wait_until="domcontentloaded", timeout=45000)
+                  resp = pg.goto(base + path + "?country=" + COUNTRY.get(key, "US"), wait_until="domcontentloaded", timeout=45000)
                   pg.wait_for_timeout(3000)
                   stat["ответ_страницы"] = resp.status if resp else None
                   currency = pg.evaluate("window.Shopify && window.Shopify.currency ? window.Shopify.currency.active : null")
                   stat["валюта"] = currency
+                  want = {"US": "USD", "DE": "EUR"}[COUNTRY.get(key, "US")]
+                  if currency != want:
+                      stat["ошибка"] = f"сайт показывает {currency}, а нужно {want}: это не та версия магазина, ничего не записано"
+                      return stat
                   rows = []
                   for n in range(1, MAX_PAGES + 1):
                       status, ctype, text = pg.evaluate(FETCH, [path, n, PORTION])
@@ -264,6 +333,8 @@ jobs:
                       stat["не_записано"] = f"сбор неполный ({len(rows)} товаров), вчерашние файлы в репозитории оставлены как есть"
                       return stat
                   rows.sort(key=lambda r: (-r["скидка_%"], r["цена_сейчас"]))
+                  stat["было_до_лимита"] = len(rows)
+                  rows = rows[:МАКС_ТОВАРОВ]
                   OUT.mkdir(exist_ok=True)
                   (OUT / f"sale_{key}.json").write_text(
                       json.dumps({"сайт": shop, "дата": date.today().isoformat(), "валюта": currency, "товаров": len(rows), "rows": rows},
