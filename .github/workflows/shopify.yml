@@ -381,7 +381,285 @@ jobs:
           if __name__ == "__main__":
               main()
           PYEOF_3
+          cat > salesforce.py <<'PYEOF_4'
+          """Сборщик Sale для сайтов на движке Salesforce Commerce Cloud (один на все такие сайты, 14.11.2026).
+
+          Сайт сам сортирует Sale по размеру скидки (srule=discount-percentage), поэтому берём только первые
+          страницы, пока не наберём 100 товаров после правил. Обычные запросы, без браузера и без обхода защиты.
+          Пишет данные/sale_<ключ>.json и top_<ключ>.csv в том же виде, что универсальный.py.
+          Размеров в сетке нет: их собираем по запросу для топа (правило «размеры по запросу»).
+          Запуск: python salesforce.py [ключ ...]
+          """
+          import csv
+          import html as H
+          import json
+          import re
+          import sys
+          import time
+          import urllib.request
+          from datetime import date, datetime, timedelta, timezone
+          from pathlib import Path
+
+          import правила_отбора
+          import размеры_фильтр
+
+          OUT = Path(__file__).parent / "данные"
+          UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
+
+          # ключ: (название, адрес, Site-ID, язык, [разделы Sale], правило сортировки по скидке)
+          SITES = {
+              # Skechers: только женское и мужское (детское на паузе, решение Ильи 12.11)
+              "skechers": ("Skechers", "https://www.skechers.com", "USSkechers", "en_US",
+                           ["womens-sale", "mens-sale"], "discount-percentage"),
+          }
+
+          # Сайты на том же движке, но со своей витриной: у каждого маленький разборщик ниже (14.11.2026)
+          # Tory Burch: витрина отдаёт обычным запросом только первые 48 товаров раздела, поэтому берём 5 разделов Sale
+          TORY = ("Tory Burch", "https://www.toryburch.com",
+                  ["/en-us/sale/handbags/", "/en-us/sale/shoes/", "/en-us/sale/clothing/", "/en-us/sale/accessories/",
+                   "/en-us/sale/categories/sport-sale/"])
+          # Saucony: взрослые разделы Sale (детское на паузе). В сетке у части товаров старой цены нет — берём её со страницы товара
+          SAUCONY = ("Saucony", "https://www.saucony.com",
+                     ["outlet-women-sale-shoes", "outlet-men-shoes", "clothing-womens-sale", "clothing-mens-sale",
+                      "womens-last-chance", "mens-last-chance"])
+
+          МАКС_ТОВАРОВ = 100
+          ТОП_CSV = 50
+          PORTION = 48
+          MAX_PAGES = 10   # на раздел; сайт уже отсортировал по скидке, дальше идти незачем
+          PAUSE = 3.0
+
+
+          def get(url):
+              req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "en-US"})
+              for wait in (0, 20, 60):
+                  time.sleep(wait)
+                  try:
+                      with urllib.request.urlopen(req, timeout=40) as r:
+                          return r.read().decode("utf-8", "ignore")
+                  except urllib.error.HTTPError as e:
+                      if e.code not in (429, 503):
+                          raise
+              raise RuntimeError(f"сайт не отвечает (429/503): {url}")
+
+
+          def text(s):
+              return re.sub(r"\s+", " ", H.unescape(re.sub(r"<[^>]+>", " ", s))).strip()
+
+
+          def parse_tiles(page, key, shop, base):
+              """Режем страницу на карточки по data-pid и достаём цену до/после, название, цвет, картинку, ссылку."""
+              rows = []
+              starts = [m.start() for m in re.finditer(r'<div class="product[\w-]*" data-pid="', page)]
+              for i, s in enumerate(starts):
+                  t = page[s: starts[i + 1] if i + 1 < len(starts) else len(page)]
+                  pid = re.search(r'data-pid="([^"]+)"', t).group(1)
+                  was = re.search(r'strike-through[^>]*>(?:\s|<!--.*?-->)*<span class="value" content="([\d.]+)"', t, re.S)
+                  now = re.search(r'<span class="sales[^"]*">\s*<span class="value" content="([\d.]+)"', t)
+                  if not (was and now):
+                      continue
+                  was, now = float(was.group(1)), float(now.group(1))
+                  if not was > now > 0:
+                      continue
+                  title = re.search(r'class="link [^"]*title[^"]*"[^>]*>(.*?)</a>', t, re.S)
+                  href = re.search(r'<a [^>]*href="(/[^"]+\.html)"', t)
+                  img = re.search(r'<img class="tile-image[^"]*"[^>]*src="([^"]+)"', t)
+                  alt = re.search(r'<img class="tile-image[^"]*"[^>]*title="([^"]+)"', t)
+                  gtm = re.search(r'data-gtm="([^"]+)"', t)
+                  info = {}
+                  if gtm:
+                      try:
+                          info = json.loads(H.unescape(gtm.group(1))).get("d", {})
+                      except ValueError:
+                          pass
+                  name = text(title.group(1)) if title else ""
+                  color = re.sub(r"\s+", " ", info.get("colorDescription") or (text(alt.group(1)).split(", ", 1)[-1] if alt else "")).strip()
+                  gender = text(re.search(r'tile__gender">(.*?)</div>', t, re.S).group(1)) if "tile__gender" in t else ""
+                  rows.append({
+                      "промо": "", "ссылка_официальная": "",
+                      "артикул": f"{key}-{pid}",
+                      "название": name,
+                      "тип": " ".join(x for x in (gender, info.get("category", "")) if x),
+                      "бренд": shop,
+                      "цвет": color.title() if color.isupper() else color,
+                      "цена_сейчас": now,
+                      "цена_была": was,
+                      "скидка_%": round((was - now) / was * 100),
+                      "валюта": "USD",
+                      "картинка": img.group(1) if img else "",
+                      "ссылка": base + href.group(1) if href else "",
+                      "размеры": [],
+                      "теги": "",
+                      "магазин": shop,
+                      "дата_сбора": date.today().isoformat(),
+                  })
+              return rows
+
+
+          def make_row(key, shop, pid, name, typ, color, now, was, img, link):
+              return {"промо": "", "ссылка_официальная": "", "артикул": f"{key}-{pid}", "название": name, "тип": typ,
+                      "бренд": shop, "цвет": color, "цена_сейчас": now, "цена_была": was,
+                      "скидка_%": round((was - now) / was * 100), "валюта": "USD", "картинка": img, "ссылка": link,
+                      "размеры": [], "теги": "", "магазин": shop, "дата_сбора": date.today().isoformat()}
+
+
+          def money(s):
+              return float(s.replace("$", "").replace(",", "").strip())
+
+
+          def tory_rows(key):
+              shop, base, paths = TORY
+              for path in paths:
+                  page = get(base + path)
+                  typ = path.rstrip("/").split("/")[-1].replace("-sale", "")
+                  starts = [m.start() for m in re.finditer(r'data-id="ProductTile" class="carousel-tile', page)]
+                  # картинка и цвет лежат в служебном списке товаров страницы (ld+json) в том же порядке, что карточки
+                  ld = []
+                  for blk in re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S):
+                      try:
+                          j = json.loads(blk)
+                      except ValueError:
+                          continue
+                      if isinstance(j, dict) and j.get("@type") == "ItemList":
+                          ld = j.get("itemListElement", [])
+                  for i, s in enumerate(starts):
+                      t = page[s: starts[i + 1] if i + 1 < len(starts) else s + 30000]
+                      was = re.search(r"original price \$([\d,.]+)", t)
+                      now = re.search(r"discounted price \$([\d,.]+)", t)
+                      if not (was and now):
+                          continue
+                      pid = re.search(r'data-product-id="([^"]+)"', t).group(1)
+                      name = re.search(r'<a title="([^"]+)"', t)
+                      href = re.search(r'href="(/en-us/[^"]+\.html[^"]*)"', t)
+                      nm = H.unescape(name.group(1)) if name else ""
+                      li = ld[i] if i < len(ld) and ld[i].get("name", "").lower() == nm.lower() else {}
+                      img = re.search(r'srcSet="(https://s7\.toryburch\.com/[^ "]+)', t)
+                      yield make_row(key, shop, pid, nm, typ, li.get("color", ""), money(now.group(1)), money(was.group(1)),
+                                     li.get("image") or (img.group(1) if img else ""),
+                                     base + H.unescape(href.group(1)) if href else "")
+                  time.sleep(PAUSE)
+
+
+          def saucony_rows(key):
+              shop, base, cats = SAUCONY
+              for cg in cats:
+                  page = get(f"{base}/en/{cg}/?sz=80&format=page-element")
+                  starts = [m.start() for m in re.finditer(r'class="product-tile', page)]
+                  for i, s in enumerate(starts):
+                      t = page[s: starts[i + 1] if i + 1 < len(starts) else s + 20000]
+                      pid = re.search(r'data-product-id="([^"]+)"', t)
+                      link = re.search(r'class="name-link" href="([^"]+)"[^>]*>(.*?)</a>', t, re.S)
+                      if not (pid and link):
+                          continue
+                      now = re.search(r'product-sales-price"[^>]*>(?:<span[^>]*>[^<]*</span>)?\s*\$([\d,.]+)', t)
+                      was = re.search(r'product-standard-price"[^>]*>(?:<span[^>]*>[^<]*</span>)?\s*\$([\d,.]+)', t)
+                      if not (now and was):
+                          # в сетке «от–до» без старой цены: смотрим страницу товара (там цена выбранного цвета и старая цена)
+                          time.sleep(1.5)
+                          pp = get(H.unescape(link.group(1)))
+                          now = re.search(r'class="price-sales[^"]*">\s*\$([\d,.]+)', pp)
+                          was = re.search(r'class="price-standard[^"]*">\s*\$([\d,.]+)', pp)
+                          if not (now and was):
+                              continue
+                      now, was = money(now.group(1)), money(was.group(1))
+                      if not was > now > 0:
+                          continue
+                      code = pid.group(1).split("~.~")[-1]
+                      name = text(link.group(2))
+                      typ = "одежда" if "clothing" in cg else "обувь" if "shoes" in cg else ""  # в last-chance всё вперемешку
+                      yield make_row(key, shop, pid.group(1).replace("~.~", "-"), name, typ, "", now, was,
+                                     f"https://thekit.wolverineworldwide.com/match/media_lookup/{code}_1/?preset=dw-altcolorprodimg",
+                                     H.unescape(link.group(1)))
+                  time.sleep(PAUSE)
+
+
+          OTHER = {"toryburch": ("Tory Burch", tory_rows), "saucony": ("Saucony", saucony_rows)}
+
+
+          def write_top_csv(key, rows):
+              cols = ["дата_сбора", "магазин", "артикул", "название", "тип", "цвет", "цена_сейчас", "цена_была",
+                      "валюта", "ссылка", "картинка", "размеры_в_наличии", "размеры_собраны"]
+              with (OUT / f"top_{key}.csv").open("w", newline="", encoding="utf-8") as f:
+                  w = csv.writer(f)
+                  w.writerow(cols)
+                  for r in rows[:ТОП_CSV]:
+                      w.writerow([r["дата_сбора"], r["магазин"], r["артикул"], r["название"], r["тип"], r["цвет"],
+                                  f'{r["цена_сейчас"]:.2f}', f'{r["цена_была"]:.2f}', r["валюта"], r["ссылка"], r["картинка"],
+                                  "", "размеры не собраны (по запросу)"])
+
+
+          def keep(row, rows, seen, stat):
+              if row["артикул"] in seen:
+                  return False
+              seen.add(row["артикул"])
+              stat["со_скидкой"] += 1
+              if правила_отбора.причина_отказа(row["название"], row["тип"]) or размеры_фильтр.широкая(row["название"], row["тип"]):
+                  stat["отсеяно_правилами"] += 1
+                  return False
+              rows.append(row)
+              return True
+
+
+          def collect(key):
+              shop = SITES[key][0] if key in SITES else OTHER[key][0]
+              stat = {"сайт": shop, "ключ": key, "страниц": 0, "со_скидкой": 0, "отсеяно_правилами": 0}
+              rows, seen = [], set()
+              try:
+                  if key in OTHER:
+                      for row in OTHER[key][1](key):
+                          keep(row, rows, seen, stat)
+                  else:
+                      _, base, site, loc, cats, srule = SITES[key]
+                  for cg in ([] if key in OTHER else cats):
+                      kept_here = 0
+                      for n in range(MAX_PAGES):
+                          url = (f"{base}/on/demandware.store/Sites-{site}-Site/{loc}/Search-UpdateGrid"
+                                 f"?cgid={cg}&srule={srule}&start={n * PORTION}&sz={PORTION}")
+                          page = get(url)
+                          got = parse_tiles(page, key, shop, base)
+                          stat["страниц"] += 1
+                          if not got:
+                              break
+                          for row in got:
+                              kept_here += keep(row, rows, seen, stat)
+                          if kept_here >= МАКС_ТОВАРОВ:
+                              break  # из этого раздела хватит: дальше скидки только меньше
+                          time.sleep(PAUSE)
+                  if not rows:
+                      stat["ошибка"] = "ни одного товара со скидкой: возможно, сайт поменял вёрстку, вчерашние файлы оставлены"
+                      return stat
+                  rows.sort(key=lambda r: (-r["скидка_%"], r["цена_сейчас"]))
+                  stat["было_до_лимита"] = len(rows)
+                  rows = rows[:МАКС_ТОВАРОВ]
+                  OUT.mkdir(exist_ok=True)
+                  (OUT / f"sale_{key}.json").write_text(
+                      json.dumps({"сайт": shop, "дата": date.today().isoformat(), "валюта": "USD", "товаров": len(rows), "rows": rows},
+                                 ensure_ascii=False), encoding="utf-8")
+                  stat["итого_в_файле"] = len(rows)
+                  write_top_csv(key, rows)
+              except Exception as e:
+                  stat["ошибка"] = f"{type(e).__name__}: {str(e)[:150]}"
+              return stat
+
+
+          def main():
+              bad = False
+              for k in sys.argv[1:] or list(SITES) + list(OTHER):
+                  if k not in SITES and k not in OTHER:
+                      print("нет такого сайта в списке:", k)
+                      continue
+                  st = collect(k)
+                  print(json.dumps(st, ensure_ascii=False), flush=True)
+                  bad = bad or ("ошибка" in st)
+              if bad:
+                  sys.exit(2)
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF_4
           python универсальный.py || echo "ВНИМАНИЕ: часть сайтов собралась не полностью, см. строки выше"
+          python salesforce.py || echo "ВНИМАНИЕ: часть сайтов Salesforce собралась не полностью, см. строки выше"
           cp данные/sale_*.json данные/top_*.csv "$GITHUB_WORKSPACE/" || true
       - name: Положить в репозиторий
         run: |
