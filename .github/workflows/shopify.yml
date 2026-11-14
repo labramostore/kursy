@@ -178,7 +178,7 @@ jobs:
           НЕ_БРАТЬ_НА_САЙТЕ = {k: ["helmet", "goggle", "replacement lens"] for k in
                                ("evo_men", "evo_women", "evo_bags")}
 
-          COUNTRY = {"burker": "DE"}  # Burker отдаёт только евро, даже при запросе США      # страна по ключу сайта; по умолчанию US (доллары). Для немецких версий: "key": "DE" (евро)
+          COUNTRY = {"burker": "DE", "asphaltgold": "DE"}  # Burker и Asphaltgold (Германия) отдают только евро, даже при запросе США (Asphaltgold — 14.11)      # страна по ключу сайта; по умолчанию US (доллары). Для немецких версий: "key": "DE" (евро)
           МАКС_ТОВАРОВ = 100  # лучших по скидке с одного сайта (решение Ильи 12.11: 100, потому что каждый день берём один магазин и из него топ-10…20 для сторис)
           ТОП_CSV = 50        # сколько лучших по скидке класть в маленький top_<ключ>.csv для таблицы
           PORTION = 50
@@ -496,11 +496,11 @@ jobs:
               return rows
 
 
-          def make_row(key, shop, pid, name, typ, color, now, was, img, link):
+          def make_row(key, shop, pid, name, typ, color, now, was, img, link, currency="USD", sizes=None):
               return {"промо": "", "ссылка_официальная": "", "артикул": f"{key}-{pid}", "название": name, "тип": typ,
                       "бренд": shop, "цвет": color, "цена_сейчас": now, "цена_была": was,
-                      "скидка_%": round((was - now) / was * 100), "валюта": "USD", "картинка": img, "ссылка": link,
-                      "размеры": [], "теги": "", "магазин": shop, "дата_сбора": date.today().isoformat()}
+                      "скидка_%": round((was - now) / was * 100), "валюта": currency, "картинка": img, "ссылка": link,
+                      "размеры": sizes or [], "теги": "", "магазин": shop, "дата_сбора": date.today().isoformat()}
 
 
           def money(s):
@@ -573,7 +573,103 @@ jobs:
                   time.sleep(PAUSE)
 
 
-          OTHER = {"toryburch": ("Tory Burch", tory_rows), "saucony": ("Saucony", saucony_rows)}
+          def gymshark_rows(key):
+              """Gymshark (свой движок на Next.js): раздел Outlet, товары лежат в данных страницы, по 60 на страницу.
+              Скидка реальная только у части (сравниваем compareAtPrice с ценой). Размеры в наличии есть сразу."""
+              base = "https://www.gymshark.com"
+              for n in range(1, 40):
+                  page = get(f"{base}/collections/outlet?page={n}")
+                  m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', page, re.S)
+                  q = json.loads(m.group(1))["props"]["pageProps"]["ssrQuery"]
+                  for x in q.get("hits", []):
+                      now, was = x.get("price") or 0, x.get("compareAtPrice") or 0
+                      if not was > now > 0:
+                          continue
+                      sizes = [[str(z["size"]).upper(), str(z["size"]).upper(), bool(z.get("inStock"))] for z in x.get("availableSizes", [])]
+                      sizes = [z for z in sizes if размеры_фильтр.обычные([z[0]]) == [z[0]]]
+                      g = "".join(x.get("gender") or [])
+                      typ = ("Women's " if g == "f" else "Men's " if g == "m" else "") + (x.get("type") or "").split(">")[-2:-1][0] if ">" in (x.get("type") or "") else (x.get("type") or "")
+                      yield make_row(key, "Gymshark", x["objectID"], x.get("title", ""), typ, x.get("colour", ""), float(now), float(was),
+                                     (x.get("featuredMedia") or {}).get("src", ""), f"{base}/products/{x['handle']}", sizes=sizes)
+                  if n >= q.get("nbPages", 0):
+                      break
+                  time.sleep(1.5)
+
+
+          def snipes_de_rows(key):
+              """Snipes Германия (свой движок, евро): весь Sale по 24 на странице, сортировки по скидке нет — идём по всем страницам.
+              В карточке есть и «лучшая цена за 30 дней» (по закону ЕС), пишем её в поле «промо» для сведения."""
+              base = "https://www.snipes.com"
+              eur = lambda s: float(H.unescape(s).replace("\xa0", "").replace("€", "").replace(".", "").replace(",", ".").strip())
+              for n in range(1, 200):
+                  page = get(f"{base}/de-de/c/sale-660?page={n}")
+                  starts = [m.start() for m in re.finditer(r"<sni-lib-product-tile", page)]
+                  if not starts:
+                      break
+                  for i, s in enumerate(starts):
+                      t = page[s: starts[i + 1] if i + 1 < len(starts) else s + 20000]
+                      now = re.search(r'data-id="selling-price"[^>]*>(?:<span[^>]*>[^<]*</span>)?([^<]+)<', t)
+                      was = re.search(r'data-id="cross-price"[^>]*>(?:<span[^>]*>[^<]*</span>)?([^<]+)<', t)
+                      if not (now and was):
+                          continue
+                      pid = re.search(r'data-id="(\d+)"', t)
+                      href = re.search(r'href="(/de-de/p/[^"]+)"', t)
+                      brand = re.search(r'class="brand-name"[^>]*>\s*<span[^>]*>([^<]*)', t)
+                      name = re.search(r'class="product-name"[^>]*>\s*<h2[^>]*>([^<]*)', t)
+                      img = re.search(r'<img class="desktop img-cover"[^>]*src="([^"]+)"', t)
+                      best = re.search(r"30-Tage-Bestpreis:</span><span>([^<]+)", t)
+                      full = " ".join(x for x in (H.unescape(brand.group(1)) if brand else "", H.unescape(name.group(1)) if name else "") if x)
+                      color = href.group(1).rsplit("-", 2)[-2].title() if href else ""  # цвет по-немецки из адреса: …-braun-99681
+                      row = make_row(key, "Snipes (DE)", pid.group(1) if pid else href.group(1), full, "", color,
+                                     eur(now.group(1)), eur(was.group(1)), img.group(1).replace("w_282,h_282", "w_800,h_800") if img else "",
+                                     base + href.group(1) if href else "", currency="EUR")
+                      if best:
+                          row["промо"] = "лучшая цена за 30 дней: " + H.unescape(best.group(1)).replace("\xa0", " ")
+                      yield row
+                  time.sleep(1.5)
+
+
+          def vs_rows(key):
+              """Victoria's Secret: витрина собирается в браузере, товары страница получает своим сервисом (stacks).
+              Открываем раздел в Chrome без окна и берём этот же ответ — как обычный посетитель. Цена у каждого цвета своя.
+              Бельё, бра и купальники не берём (общие правила), поэтому разделы: одежда, сон, спорт, аксессуары."""
+              from playwright.sync_api import sync_playwright
+              base = "https://www.victoriassecret.com"
+              with sync_playwright() as p:
+                  b = p.chromium.launch(channel="chrome", headless=True)
+                  for sec, typ in (("clearance-clothing", "одежда"), ("clearance-sleep", "пижамы"),
+                                   ("clearance-sport", "спорт"), ("clearance-accessories", "аксессуары")):
+                      got = []
+                      pg = b.new_context(locale="en-US").new_page()
+                      pg.on("response", lambda r: got.append(r) if "/stacks/v" in r.url else None)
+                      pg.goto(f"{base}/us/vs/sale/{sec}", wait_until="domcontentloaded", timeout=60000)
+                      pg.wait_for_timeout(8000)
+                      for r in got:
+                          try:
+                              data = r.json()
+                          except Exception:
+                              continue
+                          for st in data.get("stacks", []):
+                              for item in st.get("list", []):
+                                  for sw in item.get("swatches") or []:
+                                      pr = sw.get("price") or {}
+                                      now, was = pr.get("sale"), pr.get("original")
+                                      if not (now and was and was > now > 0 and pr.get("currency") == "USD"):
+                                          continue
+                                      img = (sw.get("productImage") or item.get("productImages") or [""])[0]
+                                      yield make_row(key, "Victoria's Secret", f"{sw.get('genericID')}-{sw.get('choiceID')}",
+                                                     sw.get("name") or item.get("name", ""), typ, sw.get("choiceLabel", ""),
+                                                     float(now), float(was), f"{base}/p/760x1013/{img}.jpg" if img else "",
+                                                     base + sw.get("url", "").split("?")[0] + f"?choice={sw.get('choiceID')}")
+                      pg.context.close()
+                      time.sleep(PAUSE)
+                  b.close()
+
+
+          OTHER = {"toryburch": ("Tory Burch", tory_rows), "saucony": ("Saucony", saucony_rows),
+                   # не Salesforce, но тоже «свой сайт без products.json»; держим тут, чтобы не плодить файлы в облаке
+                   "gymshark": ("Gymshark", gymshark_rows), "snipes_de": ("Snipes (DE)", snipes_de_rows),
+                   "vs": ("Victoria's Secret", vs_rows)}
 
 
           def write_top_csv(key, rows):
@@ -633,7 +729,7 @@ jobs:
                   rows = rows[:МАКС_ТОВАРОВ]
                   OUT.mkdir(exist_ok=True)
                   (OUT / f"sale_{key}.json").write_text(
-                      json.dumps({"сайт": shop, "дата": date.today().isoformat(), "валюта": "USD", "товаров": len(rows), "rows": rows},
+                      json.dumps({"сайт": shop, "дата": date.today().isoformat(), "валюта": rows[0]["валюта"], "товаров": len(rows), "rows": rows},
                                  ensure_ascii=False), encoding="utf-8")
                   stat["итого_в_файле"] = len(rows)
                   write_top_csv(key, rows)
