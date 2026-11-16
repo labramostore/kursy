@@ -1,10 +1,10 @@
-# Весь Sale Nike (США) раз в день. Работает в облаке GitHub, Mac включать не нужно.
-# Собрано автоматически файлом собрать_github_sale.py: внутри слово в слово nike.py и правила_отбора.py.
-# Результат: sale.json (отсортирован по скидке). Таблица Google забирает его сама.
+# –Т–µ—Б—М Sale Nike (–°–®–Р –Є –У–µ—А–Љ–∞–љ–Є—П) —А–∞–Ј –≤ –і–µ–љ—М. –†–∞–±–Њ—В–∞–µ—В –≤ –Њ–±–ї–∞–Ї–µ GitHub, Mac –≤–Ї–ї—О—З–∞—В—М –љ–µ –љ—Г–ґ–љ–Њ.
+# –°–Њ–±—А–∞–љ–Њ –∞–≤—В–Њ–Љ–∞—В–Є—З–µ—Б–Ї–Є —Д–∞–є–ї–Њ–Љ —Б–Њ–±—А–∞—В—М_github_sale.py: –≤–љ—Г—В—А–Є —Б–ї–Њ–≤–Њ –≤ —Б–ї–Њ–≤–Њ nike.py, nike_de.py –Є –њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞.py.
+# –†–µ–Ј—Г–ї—М—В–∞—В: sale.json (–°–®–Р, –і–Њ–ї–ї–∞—А—Л) –Є sale_nike_de.json (–У–µ—А–Љ–∞–љ–Є—П, –µ–≤—А–Њ), –Њ—В—Б–Њ—А—В–Є—А–Њ–≤–∞–љ—Л –њ–Њ —Б–Ї–Є–і–Ї–µ.
 name: Sale Nike
 on:
   schedule:
-    - cron: '30 7 * * *'   # 07:30 UTC = 12:30 по Астане
+    - cron: '30 7 * * *'   # 07:30 UTC = 12:30 –њ–Њ –Р—Б—В–∞–љ–µ
   workflow_dispatch:
 permissions:
   contents: write
@@ -13,57 +13,57 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Собрать Sale
+      - name: –°–Њ–±—А–∞—В—М Sale
         run: |
           mkdir -p "$RUNNER_TEMP/w" && cd "$RUNNER_TEMP/w"
-          cat > правила_отбора.py <<'PYEOF_1'
-          """Правила отбора: что НЕ берём в витрину. Общие для всех сайтов, правятся руками (или голосом через Claude).
+          cat > –њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞.py <<'PYEOF_1'
+          """–Я—А–∞–≤–Є–ї–∞ –Њ—В–±–Њ—А–∞: —З—В–Њ –Э–Х –±–µ—А—С–Љ –≤ –≤–Є—В—А–Є–љ—Г. –Ю–±—Й–Є–µ –і–ї—П –≤—Б–µ—Е —Б–∞–є—В–Њ–≤, –њ—А–∞–≤—П—В—Б—П —А—Г–Ї–∞–Љ–Є (–Є–ї–Є –≥–Њ–ї–Њ—Б–Њ–Љ —З–µ—А–µ–Ј Claude).
 
-          Ищем слова в названии и типе товара (по-английски, как на сайтах), без учёта регистра.
+          –Ш—Й–µ–Љ —Б–ї–Њ–≤–∞ –≤ –љ–∞–Ј–≤–∞–љ–Є–Є –Є —В–Є–њ–µ —В–Њ–≤–∞—А–∞ (–њ–Њ-–∞–љ–≥–ї–Є–є—Б–Ї–Є, –Ї–∞–Ї –љ–∞ —Б–∞–є—В–∞—Е), –±–µ–Ј —Г—З—С—В–∞ —А–µ–≥–Є—Б—В—А–∞.
           """
           from datetime import date
 
-          # Никогда не берём, в любой сезон
-          НИКОГДА = ["kids", "kid's", "baby", "toddler", "infant", "boys", "girls", "junior", "(gs)", "(ps)", "(td)",  # детское и подростковое
+          # –Э–Є–Ї–Њ–≥–і–∞ –љ–µ –±–µ—А—С–Љ, –≤ –ї—О–±–Њ–є —Б–µ–Ј–Њ–љ
+          –Э–Ш–Ъ–Ю–У–Ф–Р = ["kids", "kid's", "baby", "toddler", "infant", "boys", "girls", "junior", "(gs)", "(ps)", "(td)",  # –і–µ—В—Б–Ї–Њ–µ –Є –њ–Њ–і—А–Њ—Б—В–Ї–Њ–≤–Њ–µ
                      "slide", "sandal", "flip flop", "flip-flop", "sock", "underwear", "brief", "boxer",
                      "swim", "bikini", "bra ", "sports bra", "trunks"]
 
-          # Не берём зимой (ноябрь–март) — летняя одежда
-          НЕ_ЗИМОЙ = []  # выключено 08.11: зимой и поло, и футболки покупают; ждём решения по сезонности
+          # –Э–µ –±–µ—А—С–Љ –Ј–Є–Љ–Њ–є (–љ–Њ—П–±—А—МвАУ–Љ–∞—А—В) вАФ –ї–µ—В–љ—П—П –Њ–і–µ–ґ–і–∞
+          –Э–Х_–Ч–Ш–Ь–Ю–Щ = []  # –≤—Л–Ї–ї—О—З–µ–љ–Њ 08.11: –Ј–Є–Љ–Њ–є –Є –њ–Њ–ї–Њ, –Є —Д—Г—В–±–Њ–ї–Ї–Є –њ–Њ–Ї—Г–њ–∞—О—В; –ґ–і—С–Љ —А–µ—И–µ–љ–Є—П –њ–Њ —Б–µ–Ј–Њ–љ–љ–Њ—Б—В–Є
 
-          # Не берём летом (май–сентябрь) — тёплая одежда
-          НЕ_ЛЕТОМ = []  # выключено 08.11: ждём решения по сезонности
+          # –Э–µ –±–µ—А—С–Љ –ї–µ—В–Њ–Љ (–Љ–∞–євАУ—Б–µ–љ—В—П–±—А—М) вАФ —В—С–њ–ї–∞—П –Њ–і–µ–ґ–і–∞
+          –Э–Х_–Ы–Х–Ґ–Ю–Ь = []  # –≤—Л–Ї–ї—О—З–µ–љ–Њ 08.11: –ґ–і—С–Љ —А–µ—И–µ–љ–Є—П –њ–Њ —Б–µ–Ј–Њ–љ–љ–Њ—Б—В–Є
 
-          # Спорт для зала, кроссовки и обувь — круглый год, их не фильтруем (отдельного списка нет)
+          # –°–њ–Њ—А—В –і–ї—П –Ј–∞–ї–∞, –Ї—А–Њ—Б—Б–Њ–≤–Ї–Є –Є –Њ–±—Г–≤—М вАФ –Ї—А—Г–≥–ї—Л–є –≥–Њ–і, –Є—Е –љ–µ —Д–Є–ї—М—В—А—Г–µ–Љ (–Њ—В–і–µ–ї—М–љ–Њ–≥–Њ —Б–њ–Є—Б–Ї–∞ –љ–µ—В)
 
 
-          def сезон(d=None):
+          def —Б–µ–Ј–Њ–љ(d=None):
               m = (d or date.today()).month
-              return "зима" if m in (11, 12, 1, 2, 3) else "лето" if m in (5, 6, 7, 8, 9) else "межсезонье"
+              return "–Ј–Є–Љ–∞" if m in (11, 12, 1, 2, 3) else "–ї–µ—В–Њ" if m in (5, 6, 7, 8, 9) else "–Љ–µ–ґ—Б–µ–Ј–Њ–љ—М–µ"
 
 
-          def причина_отказа(название, тип, d=None):
-              """Возвращает причину, почему товар не берём, или '' если берём."""
-              text = f" {название} {тип} ".lower()
-              s = сезон(d)
-              for w in НИКОГДА:
+          def –њ—А–Є—З–Є–љ–∞_–Њ—В–Ї–∞–Ј–∞(–љ–∞–Ј–≤–∞–љ–Є–µ, —В–Є–њ, d=None):
+              """–Т–Њ–Ј–≤—А–∞—Й–∞–µ—В –њ—А–Є—З–Є–љ—Г, –њ–Њ—З–µ–Љ—Г —В–Њ–≤–∞—А –љ–µ –±–µ—А—С–Љ, –Є–ї–Є '' –µ—Б–ї–Є –±–µ—А—С–Љ."""
+              text = f" {–љ–∞–Ј–≤–∞–љ–Є–µ} {—В–Є–њ} ".lower()
+              s = —Б–µ–Ј–Њ–љ(d)
+              for w in –Э–Ш–Ъ–Ю–У–Ф–Р:
                   if w in text:
-                      return f"никогда ({w.strip()})"
-              if s == "зима":
-                  for w in НЕ_ЗИМОЙ:
+                      return f"–љ–Є–Ї–Њ–≥–і–∞ ({w.strip()})"
+              if s == "–Ј–Є–Љ–∞":
+                  for w in –Э–Х_–Ч–Ш–Ь–Ю–Щ:
                       if w in text:
-                          return f"не зимой ({w.strip()})"
-              if s == "лето":
-                  for w in НЕ_ЛЕТОМ:
+                          return f"–љ–µ –Ј–Є–Љ–Њ–є ({w.strip()})"
+              if s == "–ї–µ—В–Њ":
+                  for w in –Э–Х_–Ы–Х–Ґ–Ю–Ь:
                       if w in text:
-                          return f"не летом ({w.strip()})"
+                          return f"–љ–µ –ї–µ—В–Њ–Љ ({w.strip()})"
               return ""
           PYEOF_1
           cat > nike.py <<'PYEOF_2'
-          """Сборщик скидок Nike.com (США). Без ИИ: читает данные, которые сайт сам кладёт в страницу.
+          """–°–±–Њ—А—Й–Є–Ї —Б–Ї–Є–і–Њ–Ї Nike.com (–°–®–Р). –С–µ–Ј –Ш–Ш: —З–Є—В–∞–µ—В –і–∞–љ–љ—Л–µ, –Ї–Њ—В–Њ—А—Л–µ —Б–∞–є—В —Б–∞–Љ –Ї–ї–∞–і—С—В –≤ —Б—В—А–∞–љ–Є—Ж—Г.
 
-          Запуск:  python3 nike.py
-          Результат: nike_скидки.csv рядом со скриптом (отсортировано по размеру скидки).
+          –Ч–∞–њ—Г—Б–Ї:  python3 nike.py
+          –†–µ–Ј—Г–ї—М—В–∞—В: nike_—Б–Ї–Є–і–Ї–Є.csv —А—П–і–Њ–Љ —Б–Њ —Б–Ї—А–Є–њ—В–Њ–Љ (–Њ—В—Б–Њ—А—В–Є—А–Њ–≤–∞–љ–Њ –њ–Њ —А–∞–Ј–Љ–µ—А—Г —Б–Ї–Є–і–Ї–Є).
           """
           import csv
           import json
@@ -71,23 +71,23 @@ jobs:
           import sys
           import time
           import urllib.request
-          import правила_отбора
+          import –њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞
           from datetime import date
           from pathlib import Path
 
           UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
                 "(KHTML, like Gecko) Chrome/124 Safari/537.36")
 
-          # Страницы скидок: мужская обувь, женская обувь, вся обувь, вся распродажа
+          # –°—В—А–∞–љ–Є—Ж—Л —Б–Ї–Є–і–Њ–Ї: –Љ—Г–ґ—Б–Ї–∞—П –Њ–±—Г–≤—М, –ґ–µ–љ—Б–Ї–∞—П –Њ–±—Г–≤—М, –≤—Б—П –Њ–±—Г–≤—М, –≤—Б—П —А–∞—Б–њ—А–Њ–і–∞–ґ–∞
           PAGES = {
-              "мужское/обувь": "https://www.nike.com/w/mens-sale-shoes-3yaepznik1zy7ok",
-              "женское/обувь": "https://www.nike.com/w/womens-sale-shoes-3yaepz5e1x6zy7ok",
-              "обувь": "https://www.nike.com/w/sale-shoes-3yaepzy7ok",
-              "всё": "https://www.nike.com/w/sale-3yaep",
+              "–Љ—Г–ґ—Б–Ї–Њ–µ/–Њ–±—Г–≤—М": "https://www.nike.com/w/mens-sale-shoes-3yaepznik1zy7ok",
+              "–ґ–µ–љ—Б–Ї–Њ–µ/–Њ–±—Г–≤—М": "https://www.nike.com/w/womens-sale-shoes-3yaepz5e1x6zy7ok",
+              "–Њ–±—Г–≤—М": "https://www.nike.com/w/sale-shoes-3yaepzy7ok",
+              "–≤—Б—С": "https://www.nike.com/w/sale-3yaep",
           }
 
-          OUT = Path(__file__).with_name("nike_скидки.csv")
-          TOP_N = 60  # размеры показываем только у стольких товаров с самой большой скидкой
+          OUT = Path(__file__).with_name("nike_—Б–Ї–Є–і–Ї–Є.csv")
+          TOP_N = 60  # —А–∞–Ј–Љ–µ—А—Л –њ–Њ–Ї–∞–Ј—Л–≤–∞–µ–Љ —В–Њ–ї—М–Ї–Њ —Г —Б—В–Њ–ї—М–Ї–Є—Е —В–Њ–≤–∞—А–Њ–≤ —Б —Б–∞–Љ–Њ–є –±–Њ–ї—М—И–Њ–є —Б–Ї–Є–і–Ї–Њ–є
 
 
           def fetch(url):
@@ -99,7 +99,7 @@ jobs:
           def products_from(html):
               m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
               if not m:
-                  raise RuntimeError("На странице нет данных (возможно, сайт поменялся или заблокировал)")
+                  raise RuntimeError("–Э–∞ —Б—В—А–∞–љ–Є—Ж–µ –љ–µ—В –і–∞–љ–љ—Л—Е (–≤–Њ–Ј–Љ–Њ–ґ–љ–Њ, —Б–∞–є—В –њ–Њ–Љ–µ–љ—П–ї—Б—П –Є–ї–Є –Ј–∞–±–ї–Њ–Ї–Є—А–Њ–≤–∞–ї)")
               wall = json.loads(m.group(1))["props"]["pageProps"]["initialState"]["Wall"]
               return [p for g in wall["productGroupings"] for p in g["products"]]
 
@@ -110,109 +110,109 @@ jobs:
                   try:
                       items = products_from(fetch(url))
                   except Exception as e:
-                      print(f"[{label}] ошибка: {e}")
+                      print(f"[{label}] –Њ—И–Є–±–Ї–∞: {e}")
                       continue
-                  print(f"[{label}] товаров на странице: {len(items)}")
+                  print(f"[{label}] —В–Њ–≤–∞—А–Њ–≤ –љ–∞ —Б—В—А–∞–љ–Є—Ж–µ: {len(items)}")
                   for p in items:
                       code = p["productCode"]
                       if code in found:
-                          found[code]["раздел"] += f", {label}"
+                          found[code]["—А–∞–Ј–і–µ–ї"] += f", {label}"
                           continue
                       pr = p["prices"]
                       cur, init = pr["currentPrice"], pr["initialPrice"]
                       if not init or cur >= init:
-                          continue  # не скидка
+                          continue  # –љ–µ —Б–Ї–Є–і–Ї–∞
                       found[code] = {
-                          "артикул": code,
-                          "название": p["copy"]["title"],
-                          "тип": p["copy"].get("subTitle", ""),
-                          "цвет": p["displayColors"]["colorDescription"],
-                          "цена_сейчас_usd": cur,
-                          "цена_была_usd": init,
-                          "скидка_%": round((init - cur) / init * 100),
-                          "картинка": (p.get("colorwayImages") or {}).get("squarishURL", ""),
-                          "ссылка": p["pdpUrl"]["url"],
-                          "раздел": label,
-                          "дата_сбора": date.today().isoformat(),
+                          "–∞—А—В–Є–Ї—Г–ї": code,
+                          "–љ–∞–Ј–≤–∞–љ–Є–µ": p["copy"]["title"],
+                          "—В–Є–њ": p["copy"].get("subTitle", ""),
+                          "—Ж–≤–µ—В": p["displayColors"]["colorDescription"],
+                          "—Ж–µ–љ–∞_—Б–µ–є—З–∞—Б_usd": cur,
+                          "—Ж–µ–љ–∞_–±—Л–ї–∞_usd": init,
+                          "—Б–Ї–Є–і–Ї–∞_%": round((init - cur) / init * 100),
+                          "–Ї–∞—А—В–Є–љ–Ї–∞": (p.get("colorwayImages") or {}).get("squarishURL", ""),
+                          "—Б—Б—Л–ї–Ї–∞": p["pdpUrl"]["url"],
+                          "—А–∞–Ј–і–µ–ї": label,
+                          "–і–∞—В–∞_—Б–±–Њ—А–∞": date.today().isoformat(),
                       }
                   time.sleep(2)
 
-              rows = sorted(found.values(), key=lambda r: (-r["скидка_%"], r["цена_сейчас_usd"]))
+              rows = sorted(found.values(), key=lambda r: (-r["—Б–Ї–Є–і–Ї–∞_%"], r["—Ж–µ–љ–∞_—Б–µ–є—З–∞—Б_usd"]))
               kept, dropped = [], {}
               for r in rows:
-                  why = правила_отбора.причина_отказа(r["название"], r["тип"])
+                  why = –њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞.–њ—А–Є—З–Є–љ–∞_–Њ—В–Ї–∞–Ј–∞(r["–љ–∞–Ј–≤–∞–љ–Є–µ"], r["—В–Є–њ"])
                   if why:
                       dropped[why] = dropped.get(why, 0) + 1
                   else:
                       kept.append(r)
-              print(f"Сезон: {правила_отбора.сезон()}. Отсеяно по правилам: {sum(dropped.values())} {dropped}")
+              print(f"–°–µ–Ј–Њ–љ: {–њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞.—Б–µ–Ј–Њ–љ()}. –Ю—В—Б–µ—П–љ–Њ –њ–Њ –њ—А–∞–≤–Є–ї–∞–Љ: {sum(dropped.values())} {dropped}")
               rows = kept
               if not rows:
-                  raise SystemExit("Ничего не собрано")
-              if "--json" in sys.argv:  # режим для облака: только sale.json в текущей папке, без CSV и витрины
+                  raise SystemExit("–Э–Є—З–µ–≥–Њ –љ–µ —Б–Њ–±—А–∞–љ–Њ")
+              if "--json" in sys.argv:  # —А–µ–ґ–Є–Љ –і–ї—П –Њ–±–ї–∞–Ї–∞: —В–Њ–ї—М–Ї–Њ sale.json –≤ —В–µ–Ї—Г—Й–µ–є –њ–∞–њ–Ї–µ, –±–µ–Ј CSV –Є –≤–Є—В—А–Є–љ—Л
                   out = Path.cwd() / "sale.json"
                   out.write_text(json.dumps({"date": date.today().isoformat(), "count": len(rows), "rows": rows},
                                             ensure_ascii=False), encoding="utf-8")
-                  print(f"Готово: {len(rows)} товаров -> {out}")
+                  print(f"–У–Њ—В–Њ–≤–Њ: {len(rows)} —В–Њ–≤–∞—А–Њ–≤ -> {out}")
                   return
               save(rows)
 
 
           def load_sizes():
-              """Размеры из кэша nike_размеры.json (его делает размеры.py): {артикул: [[размер, полное_название, в_наличии], ...]}"""
-              p = Path(__file__).with_name("nike_размеры.json")
+              """–†–∞–Ј–Љ–µ—А—Л –Є–Ј –Ї—Н—И–∞ nike_—А–∞–Ј–Љ–µ—А—Л.json (–µ–≥–Њ –і–µ–ї–∞–µ—В —А–∞–Ј–Љ–µ—А—Л.py): {–∞—А—В–Є–Ї—Г–ї: [[—А–∞–Ј–Љ–µ—А, –њ–Њ–ї–љ–Њ–µ_–љ–∞–Ј–≤–∞–љ–Є–µ, –≤_–љ–∞–ї–Є—З–Є–Є], ...]}"""
+              p = Path(__file__).with_name("nike_—А–∞–Ј–Љ–µ—А—Л.json")
               return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
           def compact(sz):
-              """'7-14' если размеры идут подряд без дыр, иначе перечисление '5, 8, 10.5, 13'."""
+              """'7-14' –µ—Б–ї–Є —А–∞–Ј–Љ–µ—А—Л –Є–і—Г—В –њ–Њ–і—А—П–і –±–µ–Ј –і—Л—А, –Є–љ–∞—З–µ –њ–µ—А–µ—З–Є—Б–ї–µ–љ–Є–µ '5, 8, 10.5, 13'."""
               have = [s[0] for s in sz if s[2]]
               if not have:
-                  return "нет в наличии"
+                  return "–љ–µ—В –≤ –љ–∞–ї–Є—З–Є–Є"
               allv = [s[0] for s in sz]
               i, j = allv.index(have[0]), allv.index(have[-1])
               if len(have) >= 4 and j - i + 1 == len(have):
-                  return f"{have[0]}–{have[-1]}"
+                  return f"{have[0]}вАУ{have[-1]}"
               return ", ".join(have)
 
 
           def save(rows):
               sizes = load_sizes()
-              top = {r["артикул"] for r in rows[:TOP_N]}
+              top = {r["–∞—А—В–Є–Ї—Г–ї"] for r in rows[:TOP_N]}
               sizes = {k: v for k, v in sizes.items() if k in top}
               for r in rows:
-                  sz = sizes.get(r["артикул"])
-                  r["размеры_в_наличии"] = ", ".join(s[0] for s in sz if s[2]) if sz is not None else ""
+                  sz = sizes.get(r["–∞—А—В–Є–Ї—Г–ї"])
+                  r["—А–∞–Ј–Љ–µ—А—Л_–≤_–љ–∞–ї–Є—З–Є–Є"] = ", ".join(s[0] for s in sz if s[2]) if sz is not None else ""
               with OUT.open("w", newline="", encoding="utf-8-sig") as f:
                   w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
                   w.writeheader()
                   w.writerows(rows)
-              print(f"Готово: {len(rows)} товаров со скидкой -> {OUT}")
+              print(f"–У–Њ—В–Њ–≤–Њ: {len(rows)} —В–Њ–≤–∞—А–Њ–≤ —Б–Њ —Б–Ї–Є–і–Ї–Њ–є -> {OUT}")
               write_html(rows, sizes)
 
 
           def write_html(rows, sizes=None):
-              """Витрина с картинками: открывается двойным кликом в любом браузере."""
+              """–Т–Є—В—А–Є–љ–∞ —Б –Ї–∞—А—В–Є–љ–Ї–∞–Љ–Є: –Њ—В–Ї—А—Л–≤–∞–µ—В—Б—П –і–≤–Њ–є–љ—Л–Љ –Ї–ї–Є–Ї–Њ–Љ –≤ –ї—О–±–Њ–Љ –±—А–∞—Г–Ј–µ—А–µ."""
               from html import escape
               sizes = sizes or {}
               cards = []
               for r in rows:
-                  sz = sizes.get(r["артикул"])
+                  sz = sizes.get(r["–∞—А—В–Є–Ї—Г–ї"])
                   if sz is None:
                       pills = ""
                   elif not sz:
-                      pills = '<div class="z">размеров нет на странице</div>'
+                      pills = '<div class="z">—А–∞–Ј–Љ–µ—А–Њ–≤ –љ–µ—В –љ–∞ —Б—В—А–∞–љ–Є—Ж–µ</div>'
                   else:
                       pills = '<div class="z">' + "".join(
                           f'<i class="{"y" if ok else "x"}" title="{escape(full)}">{escape(short)}</i>' for short, full, ok in sz) + "</div>"
                   cards.append(
-                      f'<a class="c" href="{escape(r["ссылка"])}" target="_blank">'
-                      f'<img loading="lazy" src="{escape(r["картинка"])}" alt="">'
-                      f'<b>-{r["скидка_%"]}%</b>'
-                      f'<div class="n">{escape(r["название"])}</div>'
-                      f'<div class="t">{escape(r["тип"])}</div>'
-                      f'<div class="p">${r["цена_сейчас_usd"]} <s>${r["цена_была_usd"]}</s></div>{pills}'
-                      f'<div class="t">{escape(r["артикул"])}</div></a>')
+                      f'<a class="c" href="{escape(r["—Б—Б—Л–ї–Ї–∞"])}" target="_blank">'
+                      f'<img loading="lazy" src="{escape(r["–Ї–∞—А—В–Є–љ–Ї–∞"])}" alt="">'
+                      f'<b>-{r["—Б–Ї–Є–і–Ї–∞_%"]}%</b>'
+                      f'<div class="n">{escape(r["–љ–∞–Ј–≤–∞–љ–Є–µ"])}</div>'
+                      f'<div class="t">{escape(r["—В–Є–њ"])}</div>'
+                      f'<div class="p">${r["—Ж–µ–љ–∞_—Б–µ–є—З–∞—Б_usd"]} <s>${r["—Ж–µ–љ–∞_–±—Л–ї–∞_usd"]}</s></div>{pills}'
+                      f'<div class="t">{escape(r["–∞—А—В–Є–Ї—Г–ї"])}</div></a>')
               page = f"""<!doctype html><meta charset="utf-8"><title>Nike Sale {date.today()}</title>
           <style>body{{font:14px system-ui;margin:16px;background:#f5f5f5}}
           .g{{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}}
@@ -220,21 +220,144 @@ jobs:
           .c img{{width:100%;border-radius:6px}}.c b{{position:absolute;top:12px;left:12px;background:#e11;color:#fff;padding:2px 8px;border-radius:12px}}
           .n{{font-weight:600;margin-top:6px}}.t{{color:#777;font-size:12px}}.p{{font-size:16px;margin:4px 0}}s{{color:#999;font-size:13px}}
           .z{{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0}}.z i{{font-style:normal;font-size:11px;padding:1px 5px;border-radius:4px}}.z .y{{background:#e6f4ea;color:#137333;border:1px solid #9bd0a8}}.z .x{{color:#aaa;text-decoration:line-through;border:1px solid #ddd}}</style>
-          <h2>Nike Sale (США) — {len(rows)} товаров, самые большие скидки сверху</h2><div class="g">{''.join(cards)}</div>"""
-              out = Path(__file__).with_name("nike_витрина.html")
+          <h2>Nike Sale (–°–®–Р) вАФ {len(rows)} —В–Њ–≤–∞—А–Њ–≤, —Б–∞–Љ—Л–µ –±–Њ–ї—М—И–Є–µ —Б–Ї–Є–і–Ї–Є —Б–≤–µ—А—Е—Г</h2><div class="g">{''.join(cards)}</div>"""
+              out = Path(__file__).with_name("nike_–≤–Є—В—А–Є–љ–∞.html")
               out.write_text(page, encoding="utf-8")
-              print(f"Витрина с картинками -> {out}")
+              print(f"–Т–Є—В—А–Є–љ–∞ —Б –Ї–∞—А—В–Є–љ–Ї–∞–Љ–Є -> {out}")
 
 
           if __name__ == "__main__":
               main()
           PYEOF_2
+          cat > nike_de.py <<'PYEOF_3'
+          """–°–±–Њ—А—Й–Є–Ї —Б–Ї–Є–і–Њ–Ї Nike.com/de (–У–µ—А–Љ–∞–љ–Є—П, –µ–≤—А–Њ). –С–µ–Ј –Ш–Ш: —З–Є—В–∞–µ—В –і–∞–љ–љ—Л–µ, –Ї–Њ—В–Њ—А—Л–µ —Б–∞–є—В —Б–∞–Љ –Ї–ї–∞–і—С—В –≤ —Б—В—А–∞–љ–Є—Ж—Г.
+
+          –Ч–∞–њ—Г—Б–Ї:  python3 nike.py
+          –†–µ–Ј—Г–ї—М—В–∞—В: nike_de_—Б–Ї–Є–і–Ї–Є.csv —А—П–і–Њ–Љ —Б–Њ —Б–Ї—А–Є–њ—В–Њ–Љ (–Њ—В—Б–Њ—А—В–Є—А–Њ–≤–∞–љ–Њ –њ–Њ —А–∞–Ј–Љ–µ—А—Г —Б–Ї–Є–і–Ї–Є).
+          """
+          import csv
+          import json
+          import re
+          import sys
+          import time
+          import urllib.request
+          import –њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞
+          from datetime import date
+          from pathlib import Path
+
+          UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124 Safari/537.36")
+
+          # –°—В—А–∞–љ–Є—Ж—Л —Б–Ї–Є–і–Њ–Ї: –Љ—Г–ґ—Б–Ї–∞—П –Њ–±—Г–≤—М, –ґ–µ–љ—Б–Ї–∞—П –Њ–±—Г–≤—М, –≤—Б—П –Њ–±—Г–≤—М, –≤—Б—П —А–∞—Б–њ—А–Њ–і–∞–ґ–∞
+          PAGES = {
+              "–Љ—Г–ґ—Б–Ї–Њ–µ/–Њ–±—Г–≤—М": "https://www.nike.com/de/w/herren-sale-schuhe-3yaepznik1zy7ok",
+              "–ґ–µ–љ—Б–Ї–Њ–µ/–Њ–±—Г–≤—М": "https://www.nike.com/de/w/damen-sale-schuhe-3yaepz5e1x6zy7ok",
+              "–Њ–±—Г–≤—М": "https://www.nike.com/de/w/sale-schuhe-3yaepzy7ok",
+          }
+
+          OUT = Path(__file__).with_name("nike_de_—Б–Ї–Є–і–Ї–Є.csv")
+          TOP_N = 60  # —А–∞–Ј–Љ–µ—А—Л –њ–Њ–Ї–∞–Ј—Л–≤–∞–µ–Љ —В–Њ–ї—М–Ї–Њ —Г —Б—В–Њ–ї—М–Ї–Є—Е —В–Њ–≤–∞—А–Њ–≤ —Б —Б–∞–Љ–Њ–є –±–Њ–ї—М—И–Њ–є —Б–Ї–Є–і–Ї–Њ–є
+
+
+          def fetch(url, tries=3):
+              for i in range(tries - 1):
+                  try:
+                      return fetch_once(url)
+                  except Exception:
+                      time.sleep(5)
+              return fetch_once(url)
+
+
+          def fetch_once(url):
+              req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "de-DE,de;q=0.9"})
+              with urllib.request.urlopen(req, timeout=40) as r:
+                  return r.read().decode("utf-8", "replace")
+
+
+          def products_from(html):
+              m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
+              if not m:
+                  raise RuntimeError("–Э–∞ —Б—В—А–∞–љ–Є—Ж–µ –љ–µ—В –і–∞–љ–љ—Л—Е (–≤–Њ–Ј–Љ–Њ–ґ–љ–Њ, —Б–∞–є—В –њ–Њ–Љ–µ–љ—П–ї—Б—П –Є–ї–Є –Ј–∞–±–ї–Њ–Ї–Є—А–Њ–≤–∞–ї)")
+              wall = json.loads(m.group(1))["props"]["pageProps"]["initialState"]["Wall"]
+              return [p for g in wall["productGroupings"] for p in g["products"]]
+
+
+          def main():
+              found = {}
+              for label, url in PAGES.items():
+                  try:
+                      items = products_from(fetch(url))
+                  except Exception as e:
+                      print(f"[{label}] –Њ—И–Є–±–Ї–∞: {e}")
+                      continue
+                  print(f"[{label}] —В–Њ–≤–∞—А–Њ–≤ –љ–∞ —Б—В—А–∞–љ–Є—Ж–µ: {len(items)}")
+                  for p in items:
+                      code = p["productCode"]
+                      if code in found:
+                          found[code]["—А–∞–Ј–і–µ–ї"] += f", {label}"
+                          continue
+                      pr = p["prices"]
+                      cur, init = pr["currentPrice"], pr["initialPrice"]
+                      if pr.get("currency") != "EUR":
+                          continue  # –љ—Г–ґ–љ–∞ –љ–µ–Љ–µ—Ж–Ї–∞—П –≤–µ—А—Б–Є—П –≤ –µ–≤—А–Њ
+                      if not init or cur >= init:
+                          continue  # –љ–µ —Б–Ї–Є–і–Ї–∞
+                      found[code] = {
+                          "–∞—А—В–Є–Ї—Г–ї": code,
+                          "–љ–∞–Ј–≤–∞–љ–Є–µ": p["copy"]["title"],
+                          "—В–Є–њ": p["copy"].get("subTitle", ""),
+                          "—Ж–≤–µ—В": p["displayColors"]["colorDescription"],
+                          "—Ж–µ–љ–∞_—Б–µ–є—З–∞—Б_eur": cur,
+                          "—Ж–µ–љ–∞_–±—Л–ї–∞_eur": init,
+                          "—Б–Ї–Є–і–Ї–∞_%": round((init - cur) / init * 100),
+                          "–Ї–∞—А—В–Є–љ–Ї–∞": (p.get("colorwayImages") or {}).get("squarishURL", ""),
+                          "—Б—Б—Л–ї–Ї–∞": p["pdpUrl"]["url"],
+                          "—А–∞–Ј–і–µ–ї": label,
+                          "–і–∞—В–∞_—Б–±–Њ—А–∞": date.today().isoformat(),
+                      }
+                  time.sleep(2)
+
+              rows = sorted(found.values(), key=lambda r: (-r["—Б–Ї–Є–і–Ї–∞_%"], r["—Ж–µ–љ–∞_—Б–µ–є—З–∞—Б_eur"]))
+              kept, dropped = [], {}
+              for r in rows:
+                  why = –њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞.–њ—А–Є—З–Є–љ–∞_–Њ—В–Ї–∞–Ј–∞(r["–љ–∞–Ј–≤–∞–љ–Є–µ"], r["—В–Є–њ"])
+                  if not why and re.search(r"kinder|baby|kleinkind|jugend", r["—Б—Б—Л–ї–Ї–∞"], re.I):
+                      why = "–і–µ—В—Б–Ї–Њ–µ (–љ–µ–Љ–µ—Ж–Ї–Є–є –∞–і—А–µ—Б)"
+                  if why:
+                      dropped[why] = dropped.get(why, 0) + 1
+                  else:
+                      kept.append(r)
+              print(f"–°–µ–Ј–Њ–љ: {–њ—А–∞–≤–Є–ї–∞_–Њ—В–±–Њ—А–∞.—Б–µ–Ј–Њ–љ()}. –Ю—В—Б–µ—П–љ–Њ –њ–Њ –њ—А–∞–≤–Є–ї–∞–Љ: {sum(dropped.values())} {dropped}")
+              rows = kept
+              if not rows:
+                  raise SystemExit("–Э–Є—З–µ–≥–Њ –љ–µ —Б–Њ–±—А–∞–љ–Њ")
+              if "--json" in sys.argv:  # —А–µ–ґ–Є–Љ –і–ї—П –Њ–±–ї–∞–Ї–∞: —В–Њ–ї—М–Ї–Њ sale_nike_de.json –≤ —В–µ–Ї—Г—Й–µ–є –њ–∞–њ–Ї–µ, –±–µ–Ј CSV –Є –≤–Є—В—А–Є–љ—Л
+                  out = Path.cwd() / "sale_nike_de.json"
+                  out.write_text(json.dumps({"date": date.today().isoformat(), "count": len(rows), "rows": rows},
+                                            ensure_ascii=False), encoding="utf-8")
+                  print(f"–У–Њ—В–Њ–≤–Њ: {len(rows)} —В–Њ–≤–∞—А–Њ–≤ -> {out}")
+                  return
+              with OUT.open("w", newline="", encoding="utf-8-sig") as f:
+                  w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+                  w.writeheader()
+                  w.writerows(rows)
+              print(f"–У–Њ—В–Њ–≤–Њ: {len(rows)} —В–Њ–≤–∞—А–Њ–≤ —Б–Њ —Б–Ї–Є–і–Ї–Њ–є (EUR) -> {OUT}")
+
+
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF_3
           python3 nike.py --json
           cp "$RUNNER_TEMP/w/sale.json" "$GITHUB_WORKSPACE/sale.json"
-      - name: Сохранить
+          python3 nike_de.py --json || echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: Nike DE —Б–Њ–±—А–∞–ї—Б—П –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"
+          cp "$RUNNER_TEMP/w/sale_nike_de.json" "$GITHUB_WORKSPACE/sale_nike_de.json" || true
+      - name: –°–Њ—Е—А–∞–љ–Є—В—М
         run: |
           git config user.name "kurs-bot"
           git config user.email "kurs-bot@users.noreply.github.com"
           git add sale.json
+          git add sale_nike_de.json || true
           git commit -m "sale $(date -u +%F)" || exit 0
           git push
