@@ -119,14 +119,11 @@ jobs:
           SHOPIFY = {
               "wss": ("WSS", "https://www.shopwss.com", "/collections/on-sale"),
               "asphaltgold": ("Asphaltgold", "https://www.asphaltgold.com", "/collections/sale"),
-              "aldo": ("ALDO", "https://www.aldoshoes.com", "/collections/sale"),
               "shoebacca_men": ("Shoebacca (–Љ—Г–ґ—Б–Ї–Њ–µ)", "https://www.shoebacca.com", "/collections/mens-sale"),
               "shoebacca_women": ("Shoebacca (–ґ–µ–љ—Б–Ї–Њ–µ)", "https://www.shoebacca.com", "/collections/womens-sale"),
               "juicy": ("Juicy Couture", "https://juicycouture.com", "/collections/sale"),
               "dkny": ("DKNY", "https://www.donnakaran.com", "/collections/sale"),
               "alo": ("Alo Yoga", "https://www.aloyoga.com", "/collections/womens-sale-all"),
-              "forever21_women": ("Forever 21 (–ґ–µ–љ—Б–Ї–Њ–µ)", "https://www.forever21.com", "/collections/womens-sale"),
-              "forever21_men": ("Forever 21 (–Љ—Г–ґ—Б–Ї–Њ–µ)", "https://www.forever21.com", "/collections/mens-sale"),
               "justfab": ("Just Fab", "https://www.justfab.com", "/collections/sale-clearance-all"),
               "karl": ("Karl Lagerfeld", "https://www.karllagerfeldparis.com", "/collections/mens-sale"),
               "yvesrocher": ("Yves Rocher", "https://yvesrocherusa.com", "/collections/sale"),
@@ -361,7 +358,7 @@ jobs:
 
           # –Э–µ –±–µ—А—С–Љ –≤ –µ–ґ–µ–і–љ–µ–≤–љ—Л–є —Б–±–Њ—А (—А–µ—И–µ–љ–Є–µ –Ш–ї—М–Є): –Ї–Њ—Б–Љ–µ—В–Є–Ї–∞, –і–µ—В—Б–Ї–Є–µ, —В–µ—Е–љ–Є–Ї–∞ –љ–∞ –њ–∞—Г–Ј–µ; ALDO –Є Forever 21 —Г–±—А–∞–љ—Л –Є–Ј –њ–Њ–і–±–Њ—А–Ї–Є.
           # –°–±–Њ—А—Й–Є–Ї–Є —Н—В–Є—Е —Б–∞–є—В–Њ–≤ –Њ—Б—В–∞—О—В—Б—П –≤ —Д–∞–є–ї–∞—Е –љ–∞ —Б–ї—Г—З–∞–є –≤–Њ–Ј–≤—А–∞—В–∞, –љ–Њ –≤ –Њ–±–ї–∞–Ї–Њ –љ–µ —Е–Њ–і—П—В.
-          –Э–Х_–Т_–°–С–Ю–†–Х = {"yvesrocher", "abh", "mac", "tarte", "eos", "aldo", "forever21_women", "forever21_men"}
+          –Э–Х_–Т_–°–С–Ю–†–Х = {"yvesrocher", "abh", "mac", "tarte", "eos"}
 
 
           def main():
