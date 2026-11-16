@@ -1075,16 +1075,91 @@ jobs:
           if __name__ == "__main__":
               main()
           PYEOF_7
-          python —Г–љ–Є–≤–µ—А—Б–∞–ї—М–љ—Л–є.py || echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: —З–∞—Б—В—М —Б–∞–є—В–Њ–≤ —Б–Њ–±—А–∞–ї–∞—Б—М –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"
-          python salesforce.py || echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: —З–∞—Б—В—М —Б–∞–є—В–Њ–≤ Salesforce —Б–Њ–±—А–∞–ї–∞—Б—М –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"
-          python zappos.py || echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: Zappos/6pm —Б–Њ–±—А–∞–ї–Є—Б—М –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"
-          python puma.py || echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: PUMA —Б–Њ–±—А–∞–ї—Б—П –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"
-          python victorias.py || echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: Victoria's Secret —Б–Њ–±—А–∞–ї—Б—П –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"
+          cat > –Њ—В—З—С—В_—Б–±–Њ—А–∞.py <<'PYEOF_8'
+          """–Ю—В—З—С—В –њ–Њ—Б–ї–µ –Њ–±–ї–∞—З–љ–Њ–≥–Њ —Б–±–Њ—А–∞: —З—В–Њ —Б–Њ–±—А–∞–ї–Њ—Б—М, —Б–Ї–Њ–ї—М–Ї–Њ —В–Њ–≤–∞—А–Њ–≤, —З—В–Њ —Г–њ–∞–ї–Њ –Є —З—В–Њ –љ–µ –Њ–±–љ–Њ–≤–Є–ї–Њ—Б—М.
+
+          –Ч–∞–њ—Г—Б–Ї–∞–µ—В—Б—П –≤ –Њ–±–ї–∞–Ї–µ GitHub –њ–Њ—Б–ї–µ–і–љ–Є–Љ —И–∞–≥–Њ–Љ (—Б–Љ. —Б–Њ–±—А–∞—В—М_github_shopify.py). –Я–Є—И–µ—В report.md —А—П–і–Њ–Љ.
+          –І–Є—В–∞–µ—В –і–∞–љ–љ—Л–µ/sale_*.json –Є –і–∞–љ–љ—Л–µ/top_*.csv, –∞ —Б–њ–Є—Б–Њ–Ї —Б–±–Њ–µ–≤ –±–µ—А—С—В –Є–Ј —Д–∞–є–ї–∞ –њ—А–Њ–≤–∞–ї—Л.txt
+          (—В—Г–і–∞ relay-—Б–Ї—А–Є–њ—В –њ–Є—И–µ—В –Є–Љ—П —Б–±–Њ—А—Й–Є–Ї–∞, –µ—Б–ї–Є –Њ–љ —Г–њ–∞–ї).
+          –Ч–∞–њ—Г—Б–Ї: python3 –Њ—В—З—С—В_—Б–±–Њ—А–∞.py <–њ–∞–њ–Ї–∞_—Б_–і–∞–љ–љ—Л–Љ–Є> <–Є–Љ—П_–Њ—В—З—С—В–∞.md>
+          """
+          import csv
+          import json
+          import sys
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          ASTANA = timezone(timedelta(hours=5))
+
+
+          def count_sale(path):
+              try:
+                  d = json.loads(path.read_text(encoding="utf-8"))
+              except Exception:
+                  return None
+              if isinstance(d, dict):
+                  for k in ("rows", "items", "products"):
+                      if isinstance(d.get(k), list):
+                          return len(d[k])
+                  return None
+              return len(d) if isinstance(d, list) else None
+
+
+          def count_top(path):
+              try:
+                  with path.open(encoding="utf-8-sig") as f:
+                      return max(0, sum(1 for _ in csv.reader(f)) - 1)
+              except Exception:
+                  return None
+
+
+          def main():
+              data = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("–і–∞–љ–љ—Л–µ")
+              out = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("report.md")
+              failed_file = Path("–њ—А–Њ–≤–∞–ї—Л.txt")
+              failed = [x.strip() for x in failed_file.read_text(encoding="utf-8").splitlines() if x.strip()] \
+                  if failed_file.exists() else []
+              now = datetime.now(ASTANA)
+              today = now.date()
+
+              rows, stale = [], []
+              for sp in sorted(data.glob("sale_*.json")):
+                  key = sp.name[len("sale_"):-len(".json")]
+                  mtime = datetime.fromtimestamp(sp.stat().st_mtime, ASTANA).date()
+                  n_sale = count_sale(sp)
+                  n_top = count_top(data / f"top_{key}.csv")
+                  if mtime != today:
+                      stale.append(key)
+                  rows.append((key, n_sale, n_top, mtime))
+
+              lines = [f"# –Ю—В—З—С—В —Б–±–Њ—А–∞ вАФ {now:%d.%m.%Y %H:%M} (–Р—Б—В–∞–љ–∞)", ""]
+              lines.append("## –І—В–Њ –љ–µ —Б–Њ–±—А–∞–ї–Њ—Б—М")
+              lines += [f"- {x}" for x in failed] or ["- –Э–Є—З–µ–≥–Њ: –≤—Б–µ —Б–±–Њ—А—Й–Є–Ї–Є –Њ—В—А–∞–±–Њ—В–∞–ї–Є –±–µ–Ј –Њ—И–Є–±–Њ–Ї."]
+              lines += ["", "## –§–∞–є–ї—Л, –Ї–Њ—В–Њ—А—Л–µ –љ–µ –Њ–±–љ–Њ–≤–Є–ї–Є—Б—М —Б–µ–≥–Њ–і–љ—П"]
+              lines += [f"- {x}" for x in stale] or ["- –Э–µ—В: –≤—Б–µ —Д–∞–є–ї—Л —Б–≤–µ–ґ–Є–µ."]
+              lines += ["", "## –І—В–Њ —Б–Њ–±—А–∞–љ–Њ", "", "| –Ь–∞–≥–∞–Ј–Є–љ | –Ґ–Њ–≤–∞—А–Њ–≤ –≤ Sale | –Т —В–Њ–њ–µ | –Ф–∞—В–∞ —Д–∞–є–ї–∞ |", "|---|---|---|---|"]
+              for key, n_sale, n_top, mt in rows:
+                  lines.append(f"| {key} | {'вАФ' if n_sale is None else n_sale} | {'вАФ' if n_top is None else n_top} | {mt:%d.%m} |")
+              lines += ["", f"–Т—Б–µ–≥–Њ –Љ–∞–≥–∞–Ј–Є–љ–Њ–≤ —Б —Д–∞–є–ї–Њ–Љ: {len(rows)}. –°–±–Њ—А –Њ—В—З—С—В–∞: {now:%H:%M} –њ–Њ –Р—Б—В–∞–љ–µ."]
+              out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+              print(f"–Ю—В—З—С—В: {out} ({len(rows)} –Љ–∞–≥–∞–Ј–Є–љ–Њ–≤, —Б–±–Њ–µ–≤: {len(failed)}, —Г—Б—В–∞—А–µ–≤—И–Є—Е: {len(stale)})")
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF_8
+          python —Г–љ–Є–≤–µ—А—Б–∞–ї—М–љ—Л–є.py || { echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: —З–∞—Б—В—М —Б–∞–є—В–Њ–≤ —Б–Њ–±—А–∞–ї–∞—Б—М –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О, —Б–Љ. —Б—В—А–Њ–Ї–Є –≤—Л—И–µ"; echo "–£–љ–Є–≤–µ—А—Б–∞–ї—М–љ—Л–є (Shopify –Є Shop Simon)" >> –њ—А–Њ–≤–∞–ї—Л.txt; }
+          python salesforce.py || { echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: —З–∞—Б—В—М —Б–∞–є—В–Њ–≤ Salesforce —Б–Њ–±—А–∞–ї–∞—Б—М –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О"; echo "Salesforce (Skechers, Tory Burch, Saucony, Gymshark, Snipes DE)" >> –њ—А–Њ–≤–∞–ї—Л.txt; }
+          python zappos.py || { echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: Zappos/6pm —Б–Њ–±—А–∞–ї–Є—Б—М –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О"; echo "Zappos –Є 6pm" >> –њ—А–Њ–≤–∞–ї—Л.txt; }
+          python puma.py || { echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: PUMA —Б–Њ–±—А–∞–ї—Б—П –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О"; echo "PUMA" >> –њ—А–Њ–≤–∞–ї—Л.txt; }
+          python victorias.py || { echo "–Т–Э–Ш–Ь–Р–Э–Ш–Х: Victoria's Secret —Б–Њ–±—А–∞–ї—Б—П –љ–µ –њ–Њ–ї–љ–Њ—Б—В—М—О"; echo "Victoria's Secret" >> –њ—А–Њ–≤–∞–ї—Л.txt; }
+          python3 –Њ—В—З—С—В_—Б–±–Њ—А–∞.py –і–∞–љ–љ—Л–µ report.md || true
+          cp report.md "$GITHUB_WORKSPACE/report.md" || true
           cp –і–∞–љ–љ—Л–µ/sale_*.json –і–∞–љ–љ—Л–µ/top_*.csv "$GITHUB_WORKSPACE/" || true
       - name: –Я–Њ–ї–Њ–ґ–Є—В—М –≤ —А–µ–њ–Њ–Ј–Є—В–Њ—А–Є–є
         run: |
           git config user.name "kurs-bot"
           git config user.email "kurs-bot@users.noreply.github.com"
-          git add sale_*.json top_*.csv
+          git add sale_*.json top_*.csv report.md
           git commit -m "shopify $(date -u +%F)" || exit 0
           git push
