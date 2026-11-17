@@ -49,7 +49,6 @@ jobs:
               ("Cettire", "https://www.cettire.com"),
               ("SSENSE", "https://www.ssense.com"),
               ("YOOX", "https://www.yoox.com"),
-              ("Finish Line", "https://www.finishline.com"),
               ("Saks OFF 5TH", "https://www.saksoff5th.com"),
           ]
 
@@ -148,7 +147,6 @@ jobs:
           armaniexchange.com,Armani Exchange,https://www.armaniexchange.com/us,одежда и обувь,гайд,не открылся,,
           jcrew.com,J.Crew,https://www.jcrew.com,одежда и обувь,гайд,открыт,,да
           guessfactory.com,Guess Factory,https://www.guessfactory.com/us/en/home/,одежда и обувь,гайд,закрыт защитой,,
-          uniqlo.com,Uniqlo,https://www.uniqlo.com/us/en,одежда и обувь,гайд,закрыт защитой,,
           wrangler.com,Wrangler,https://www.wrangler.com,одежда и обувь,гайд,закрыт защитой,,
           armani.com,Armani,https://www.armani.com/en-us,одежда и обувь,гайд,открыт,,да
           danskin.com,Danskin,https://www.danskin.com/,одежда и обувь,гайд,не открылся,,
@@ -184,7 +182,6 @@ jobs:
           cettire.com,Cettire,https://www.cettire.com,одежда и обувь,список,закрыт защитой,,
           ssense.com,SSENSE,https://www.ssense.com,одежда и обувь,список,закрыт защитой,,
           yoox.com,YOOX,https://www.yoox.com,одежда и обувь,список,закрыт защитой,,
-          finishline.com,Finish Line,https://www.finishline.com,одежда и обувь,список,закрыт защитой,,
           carters.com,Carter’s,https://www.carters.com/,детские (не берём),гайд,,,
           shopdisney.com,Disney,https://www.shopdisney.com/,детские (не берём),гайд,,,
           gymboree.com,Gymboree,https://www.gymboree.com/us/home,детские (не берём),гайд,,,
