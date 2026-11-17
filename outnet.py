@@ -17,6 +17,9 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
+import правила_отбора
+from универсальный import write_top_csv
+
 DIR = Path(__file__).parent
 OUT = DIR / "данные"
 BASE = "https://theoutnet.com"
@@ -123,6 +126,10 @@ def main():
     out = OUT / "sale_outnet.json"
     out.write_text(json.dumps({"сайт": "THE OUTNET", "дата": date.today().isoformat(), "валюта": "USD",
                                "товаров": len(rows), "rows": rows}, ensure_ascii=False), encoding="utf-8")
+    # top_outnet.csv для таблицы: лучшие по скидке, без детского по правилам отбора
+    top = [dict(r, тип=r.get("тип", ""), цвет=r.get("цвет", "")) for r in rows
+           if not правила_отбора.причина_отказа(r["название"] + " " + r["артикул"], "")]
+    write_top_csv("outnet", top)
     print(json.dumps(stat, ensure_ascii=False))
     print(f"Записано: {out} ({len(rows)} товаров с реальной скидкой)")
 
