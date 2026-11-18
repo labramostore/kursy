@@ -1,6 +1,6 @@
 # Весь Sale Nike (США и Германия) раз в день. Работает в облаке GitHub, Mac включать не нужно.
 # Собрано автоматически файлом собрать_github_sale.py: внутри слово в слово nike.py, nike_de.py и правила_отбора.py.
-# Результат: sale.json (США, доллары) и sale_nike_de.json (Германия, евро), отсортированы по скидке.
+# Результат: sale.json (США, доллары), sale_nike_de.json (Германия, евро), sale_nike_full.json (США, до 700, порядок сайта «популярное», с метками бестселлер и акциями).
 name: Sale Nike
 on:
   schedule:
@@ -349,15 +349,96 @@ jobs:
           if __name__ == "__main__":
               main()
           PYEOF_3
+          cat > nike_полный.py <<'PYEOF_4'
+          """Полный сбор Sale Nike (США) по единому стандарту: чистка мусора, потолок 700, порядок сайта «популярное».
+          Без ИИ и без браузера: читает тот же API, который использует сайт при прокрутке.
+          Запуск: python3 nike_полный.py   ->  данные/sale_nike_полный.json
+          В облаке: python3 nike_полный.py --json  ->  sale_nike_full.json в текущей папке
+          """
+          import json, sys, time, urllib.request
+          from datetime import date
+          from pathlib import Path
+          import правила_отбора
+
+          UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36")
+          BASE = ("https://api.nike.com/discover/product_wall/v1/marketplace/US/language/en/consumerChannelId/"
+                  "d9a5bc42-4b9c-4976-858a-f159cf99c647?path=/w/sale-3yaep&attributeIds=5b21a62a-0503-400c-8336-3ccfbff2a684"
+                  "&queryType=PRODUCTS&anchor={a}&count=24")
+          CAP = 700
+          MAX_PAGES = 90
+          OUT = Path(__file__).with_name("данные") / "sale_nike_полный.json"
+
+
+          def fetch(a):
+              req = urllib.request.Request(BASE.format(a=a), headers={
+                  "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9",
+                  "nike-api-caller-id": "com.nike.commerce.nikedotcom.web"})
+              with urllib.request.urlopen(req, timeout=40) as r:
+                  return json.loads(r.read())
+
+
+          def main():
+              kept, dropped, seen = [], {}, set()
+              seen_raw = 0
+              for page in range(MAX_PAGES):
+                  try:
+                      d = fetch(page * 24)
+                  except Exception as e:
+                      print(f"стр.{page}: ошибка {e}"); break
+                  prods = [p for g in (d.get("productGroupings") or []) for p in (g.get("products") or [])]
+                  if not prods:
+                      break
+                  for p in prods:
+                      code = p["productCode"]
+                      if code in seen:
+                          continue
+                      seen.add(code); seen_raw += 1
+                      pr = p["prices"]
+                      cur, init = pr["currentPrice"], pr.get("initialPrice")
+                      if not init or cur >= init:
+                          continue
+                      title, sub = p["copy"]["title"], p["copy"].get("subTitle", "")
+                      why = правила_отбора.причина_отказа(title, sub)
+                      if why:
+                          dropped[why] = dropped.get(why, 0) + 1
+                          continue
+                      vis = ((p.get("promotions") or {}).get("visibilities") or [{}])[0]
+                      kept.append({
+                          "артикул": code, "название": title, "тип": sub,
+                          "категория": p.get("productType", ""),
+                          "цвет": p["displayColors"]["colorDescription"],
+                          "цена_сейчас_usd": cur, "цена_была_usd": init, "скидка_%": round((init - cur) / init * 100),
+                          "метка": p.get("badgeAttribute") or "",
+                          "акция_текст": vis.get("title", ""), "акция_до": (vis.get("visibilityEndDate") or "")[:10],
+                          "картинка": (p.get("colorwayImages") or {}).get("squarishURL", ""),
+                          "ссылка": p["pdpUrl"]["url"], "порядок_на_сайте": seen_raw, "дата_сбора": date.today().isoformat(),
+                      })
+                  if len(kept) >= CAP:
+                      break
+                  time.sleep(1.2)
+              kept = kept[:CAP]
+              out = (Path.cwd() / "sale_nike_full.json") if "--json" in sys.argv else OUT  # --json: режим облака
+              out.parent.mkdir(exist_ok=True)
+              out.write_text(json.dumps({"date": date.today().isoformat(), "count": len(kept), "rows": kept}, ensure_ascii=False), encoding="utf-8")
+              print(f"Просмотрено {seen_raw}, оставлено {len(kept)}, отсеяно правилами {sum(dropped.values())} {dropped}")
+              print(f"-> {out}")
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF_4
           python3 nike.py --json
           cp "$RUNNER_TEMP/w/sale.json" "$GITHUB_WORKSPACE/sale.json"
           python3 nike_de.py --json || echo "ВНИМАНИЕ: Nike DE собрался не полностью, см. строки выше"
           cp "$RUNNER_TEMP/w/sale_nike_de.json" "$GITHUB_WORKSPACE/sale_nike_de.json" || true
+          python3 nike_полный.py --json || echo "ВНИМАНИЕ: полный Nike (до 700) не собрался, см. строки выше"
+          cp "$RUNNER_TEMP/w/sale_nike_full.json" "$GITHUB_WORKSPACE/sale_nike_full.json" || true
       - name: Сохранить
         run: |
           git config user.name "kurs-bot"
           git config user.email "kurs-bot@users.noreply.github.com"
           git add sale.json
           git add sale_nike_de.json || true
+          git add sale_nike_full.json || true
           git commit -m "sale $(date -u +%F)" || exit 0
           git push
