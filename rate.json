@@ -1,7 +1,7 @@
 {
- "sell": 85.7,
+ "sell": 85.9,
  "cbr": 82.2281,
- "eur_sell": 94.1,
+ "eur_sell": 94.45,
  "eur_cbr": 90.3605,
  "date": "2026-11-19",
  "source": "api.tbank.ru, DebitCardsTransfers, sell"
